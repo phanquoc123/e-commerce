@@ -24,6 +24,15 @@ export class UpdateCategoryDto {
   @IsOptional()
   @IsInt()
   sort_order?: number;
+
+  @ApiPropertyOptional({ 
+    example: 'https://example.com/category-thumbnail.jpg',
+    description: 'URL of the category thumbnail image'
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  thumbnail?: string | null;
 }
 
 

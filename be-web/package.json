@@ -19,10 +19,14 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration:create": "npm run typeorm -- migration:create src/db/migrations/",
-    "migration:generate": "npm run typeorm -- migration:generate -d src/configs/typeorm.config.ts src/db/migrations/",
     "migration:run": "npm run typeorm -- migration:run -d src/configs/typeorm.config.ts",
-    "migration:revert": "npm run typeorm -- migration:revert -d src/configs/typeorm.config.ts"
+    "migration:drop": "npm run typeorm -- schema:drop -d src/configs/typeorm.config.ts",
+    "seed": "ts-node -r tsconfig-paths/register src/scripts/seed-all.ts",
+    "seed:categories": "ts-node -r tsconfig-paths/register src/scripts/seed-categories.ts",
+    "seed:colors": "ts-node -r tsconfig-paths/register src/scripts/seed-colors.ts",
+    "seed:sizes": "ts-node -r tsconfig-paths/register src/scripts/seed-sizes.ts",
+    "seed:products": "ts-node -r tsconfig-paths/register src/scripts/seed-products.ts",
+    "seed:collections": "ts-node -r tsconfig-paths/register src/scripts/seed-collections.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

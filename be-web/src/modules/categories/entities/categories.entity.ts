@@ -7,11 +7,11 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Expose } from 'class-transformer';
-import { BaseEntityWithTimestamps } from 'src/common/entities/base-timestamp.entity';
+import { BaseEntityWithTimestamps } from '../../../common/entities/base-timestamp.entity';
 
 @Entity({ name: 'categories' })
 export class CategoryEntity extends BaseEntityWithTimestamps {
-  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
+  @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   @Expose()
   id: number;
 
@@ -23,7 +23,11 @@ export class CategoryEntity extends BaseEntityWithTimestamps {
   @Expose()
   slug: string;
 
-  @Column({ type: 'int', nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Expose()
+  thumbnail: string | null;
+
+  @Column({ type: 'bigint', nullable: true })
   @Expose({ name: 'parent_id' })
   parentId: number | null;
 
@@ -37,6 +41,9 @@ export class CategoryEntity extends BaseEntityWithTimestamps {
 
   @OneToMany(() => CategoryEntity, (category) => category.parent)
   children: CategoryEntity[];
+
+  @OneToMany('ProductEntity', 'category')
+  products: any[];
 
   @Column({ type: 'boolean', nullable: false, default: true })
   @Expose({ name: 'is_active' })

@@ -55,6 +55,6 @@ export const MysqlDataSource = new DataSource({
   username: DB_USERNAME,
   password: DB_PASSWORD,
   database: DB_DATABASE,
-  entities: ['dist/modules/**/*.entity{.ts,.js}'],
-  migrations: ['dist/db/migrations/*.{ts,js}'],
+  entities: ['src/modules/**/*.entity.ts'],
+  migrations: ['src/db/migrations/*.ts'],
 });
