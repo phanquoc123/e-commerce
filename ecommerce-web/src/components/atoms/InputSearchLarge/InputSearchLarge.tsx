@@ -6,7 +6,11 @@ interface InputSearchProps {
   debounceMs?: number;
 }
 
-export default function InputSearch({ onSearch, className = '', debounceMs = 300 }: InputSearchProps) {
+export default function InputSearchLarge({
+  onSearch,
+  className = '',
+  debounceMs = 300,
+}: InputSearchProps) {
   const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
@@ -29,7 +33,7 @@ export default function InputSearch({ onSearch, className = '', debounceMs = 300
       placeholder="Tìm kiếm"
       value={inputValue}
       onChange={handleChange}
-      className={`w-57.5 focus:outline-none h-[34px] rounded-full border border-gray-300 p-2 ${className}`}
+      className={`h-[34px] w-full rounded-full border border-gray-300 px-4 py-2 focus:outline-none lg:h-11 lg:py-3 ${className}`}
     />
   );
 }
