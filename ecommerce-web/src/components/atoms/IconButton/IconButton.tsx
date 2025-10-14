@@ -9,12 +9,12 @@ interface IconButtonProps {
   disabled?: boolean;
 }
 
-export default function IconButton({ 
-  icon, 
-  label, 
-  onClick, 
-  className = '', 
-  disabled = false 
+export default function IconButton({
+  icon,
+  label,
+  onClick,
+  className = '',
+  disabled = false,
 }: IconButtonProps) {
   return (
     <button

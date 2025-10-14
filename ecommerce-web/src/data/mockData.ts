@@ -267,3 +267,17 @@ export const megaMenuData = {
     items: collections,
   },
 };
+
+export const mockProducts = Array.from({ length: 10 }, (_, i) => ({
+  id: `product-${i + 1}`,
+  name: `Sản phẩm ${i + 1}`,
+  price: `${(i + 1) * 100000}đ`,
+  image: `https://images.unsplash.com/photo-${1500000000000 + i}?w=200&h=200&fit=crop`,
+  colors: ['#FF0000', '#00FF00', '#0000FF', '#FFFF00'],
+  colorImages: {
+    '#FF0000': `https://images.unsplash.com/photo-${1500000000000 + i}?w=200&h=200&fit=crop&sat=100`,
+    '#00FF00': `https://images.unsplash.com/photo-${1500000000000 + i + 1}?w=200&h=200&fit=crop&sat=100`,
+    '#0000FF': `https://images.unsplash.com/photo-${1500000000000 + i + 2}?w=200&h=200&fit=crop&sat=100`,
+    '#FFFF00': `https://images.unsplash.com/photo-${1500000000000 + i + 3}?w=200&h=200&fit=crop&sat=100`,
+  },
+}));

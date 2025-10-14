@@ -1,4 +1,4 @@
-import InputSearch from '../atoms/InputSearch/InputSearch';
+import InputSearch from '../../atoms/InputSearch/InputSearch';
 
 interface SearchBarProps {
   onSearch?: (query: string) => void;
