@@ -1,15 +1,15 @@
 import InputSearch from '../../atoms/InputSearch/InputSearch';
 
 interface SearchBarProps {
-  onSearch?: (query: string) => void;
   className?: string;
   debounceMs?: number;
+  onClick?: () => void;
 }
 
-export default function SearchBar({ onSearch, className = '', debounceMs }: SearchBarProps) {
+export default function SearchBar({ className = '', debounceMs, onClick }: SearchBarProps) {
   return (
     <div className={`flex items-center ${className}`}>
-      <InputSearch onSearch={onSearch} debounceMs={debounceMs} />
+      <InputSearch debounceMs={debounceMs} onClick={onClick} />
     </div>
   );
 }

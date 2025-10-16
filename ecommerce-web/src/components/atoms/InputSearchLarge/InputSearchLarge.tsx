@@ -33,7 +33,7 @@ export default function InputSearchLarge({
       placeholder="Tìm kiếm"
       value={inputValue}
       onChange={handleChange}
-      className={`h-[34px] w-full rounded-full border border-gray-300 px-4 py-2 focus:outline-none lg:h-11 lg:py-3 ${className}`}
+      className={`h-11 w-full rounded-full border border-gray-300 px-4 py-2 focus:outline-none lg:py-3 ${className}`}
     />
   );
 }

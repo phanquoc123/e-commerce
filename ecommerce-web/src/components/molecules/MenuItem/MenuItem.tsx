@@ -30,11 +30,10 @@ export default function MenuItem({ label, slug, icon, className = '' }: MenuItem
   return (
     <a
       href={slug}
-      className={`flex items-center gap-2 whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 ${className}`}
+      className={`flex items-center gap-2 whitespace-nowrap rounded-md bg-[#F3F4F6] px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 ${className}`}
     >
       {iconComponent && <FontAwesomeIcon icon={iconComponent} className="h-4 w-4" />}
       <span>{label}</span>
     </a>
   );
 }
-

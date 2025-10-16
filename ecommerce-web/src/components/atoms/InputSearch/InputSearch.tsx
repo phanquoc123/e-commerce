@@ -1,23 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface InputSearchProps {
-  onSearch?: (query: string) => void;
   className?: string;
   debounceMs?: number;
+  onClick?: () => void;
 }
 
-export default function InputSearch({ onSearch, className = '', debounceMs = 300 }: InputSearchProps) {
+export default function InputSearch({ className = '', onClick }: InputSearchProps) {
   const [inputValue, setInputValue] = useState('');
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (onSearch) {
-        onSearch(inputValue);
-      }
-    }, debounceMs);
-
-    return () => clearTimeout(timer);
-  }, [inputValue, onSearch, debounceMs]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -29,7 +19,8 @@ export default function InputSearch({ onSearch, className = '', debounceMs = 300
       placeholder="Tìm kiếm"
       value={inputValue}
       onChange={handleChange}
-      className={`w-57.5 focus:outline-none h-[34px] rounded-full border border-gray-300 p-2 ${className}`}
+      onClick={onClick}
+      className={`w-57.5 h-[34px] rounded-full border border-gray-300 p-2 focus:outline-none cursor-pointer ${className}`}
     />
   );
 }

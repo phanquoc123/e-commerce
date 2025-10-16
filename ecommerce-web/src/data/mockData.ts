@@ -44,24 +44,51 @@ export const menCategories: Category[] = [
     name: 'Áo khoác nam',
     slug: '/nam/ao-khoac',
     icon: '/images/categories/imagepr.webp',
+    subCategories: [
+      { id: 'm1-1', name: 'Tất cả', slug: '/nam/ao-khoac/tat-ca' },
+      { id: 'm1-2', name: 'Áo chống nắng nam', slug: '/nam/ao-khoac/ao-chong-nang' },
+      { id: 'm1-3', name: 'Áo vest nam', slug: '/nam/ao-khoac/ao-vest' },
+      { id: 'm1-4', name: 'Áo gió nam', slug: '/nam/ao-khoac/ao-gio' },
+      { id: 'm1-5', name: 'Áo phao nam', slug: '/nam/ao-khoac/ao-phao' },
+    ],
   },
   {
     id: 'm2',
     name: 'Áo nam',
     slug: '/nam/ao',
     icon: '/images/categories/imagepr.webp',
+    subCategories: [
+      { id: 'm2-1', name: 'Tất cả', slug: '/nam/ao/tat-ca' },
+      { id: 'm2-2', name: 'Áo thun nam', slug: '/nam/ao/ao-thun' },
+      { id: 'm2-3', name: 'Áo sơ mi nam', slug: '/nam/ao/ao-so-mi' },
+      { id: 'm2-4', name: 'Áo polo nam', slug: '/nam/ao/ao-polo' },
+      { id: 'm2-5', name: 'Áo len nam', slug: '/nam/ao/ao-len' },
+    ],
   },
   {
     id: 'm3',
     name: 'Quần nam',
     slug: '/nam/quan',
     icon: '/images/categories/imagepr.webp',
+    subCategories: [
+      { id: 'm3-1', name: 'Tất cả', slug: '/nam/quan/tat-ca' },
+      { id: 'm3-2', name: 'Quần jean nam', slug: '/nam/quan/quan-jean' },
+      { id: 'm3-3', name: 'Quần kaki nam', slug: '/nam/quan/quan-kaki' },
+      { id: 'm3-4', name: 'Quần short nam', slug: '/nam/quan/quan-short' },
+      { id: 'm3-5', name: 'Quần âu nam', slug: '/nam/quan/quan-au' },
+    ],
   },
   {
     id: 'm4',
     name: 'Đồ thể thao nam',
     slug: '/nam/do-the-thao',
     icon: '/images/categories/imagepr.webp',
+    subCategories: [
+      { id: 'm4-1', name: 'Tất cả', slug: '/nam/do-the-thao/tat-ca' },
+      { id: 'm4-2', name: 'Bộ thể thao nam', slug: '/nam/do-the-thao/bo' },
+      { id: 'm4-3', name: 'Áo thể thao nam', slug: '/nam/do-the-thao/ao' },
+      { id: 'm4-4', name: 'Quần thể thao nam', slug: '/nam/do-the-thao/quan' },
+    ],
   },
   {
     id: 'm5',
@@ -90,18 +117,36 @@ export const womenCategories: Category[] = [
     name: 'Áo khoác nữ',
     slug: '/nu/ao-khoac',
     icon: '/images/categories/imagepr.webp',
+    subCategories: [
+      { id: 'w1-1', name: 'Tất cả', slug: '/nu/ao-khoac/tat-ca' },
+      { id: 'w1-2', name: 'Áo vest nữ', slug: '/nu/ao-khoac/ao-vest' },
+      { id: 'w1-3', name: 'Áo blazer nữ', slug: '/nu/ao-khoac/ao-blazer' },
+      { id: 'w1-4', name: 'Áo khoác dạ nữ', slug: '/nu/ao-khoac/ao-khoac-da' },
+    ],
   },
   {
     id: 'w2',
     name: 'Áo nữ',
     slug: '/nu/ao',
     icon: '/images/categories/imagepr.webp',
+    subCategories: [
+      { id: 'w2-1', name: 'Tất cả', slug: '/nu/ao/tat-ca' },
+      { id: 'w2-2', name: 'Áo thun nữ', slug: '/nu/ao/ao-thun' },
+      { id: 'w2-3', name: 'Áo sơ mi nữ', slug: '/nu/ao/ao-so-mi' },
+      { id: 'w2-4', name: 'Áo đầm nữ', slug: '/nu/ao/ao-dam' },
+    ],
   },
   {
     id: 'w3',
     name: 'Quần nữ',
     slug: '/nu/quan',
     icon: '/images/categories/imagepr.webp',
+    subCategories: [
+      { id: 'w3-1', name: 'Tất cả', slug: '/nu/quan/tat-ca' },
+      { id: 'w3-2', name: 'Quần jean nữ', slug: '/nu/quan/quan-jean' },
+      { id: 'w3-3', name: 'Quần kaki nữ', slug: '/nu/quan/quan-kaki' },
+      { id: 'w3-4', name: 'Quần short nữ', slug: '/nu/quan/quan-short' },
+    ],
   },
   {
     id: 'w4',
@@ -219,6 +264,7 @@ export interface GenderCategory {
   id: string;
   title: string;
   slug: string;
+  image?: string;
   categories: Category[];
 }
 
@@ -227,18 +273,21 @@ export const genderCategoriesData: GenderCategory[] = [
     id: 'men',
     title: 'NAM',
     slug: '/nam',
+    image: '/images/categories/imagepr.webp',
     categories: menCategories,
   },
   {
     id: 'women',
     title: 'NỮ',
     slug: '/nu',
+    image: '/images/categories/imagepr.webp',
     categories: womenCategories,
   },
   {
     id: 'kids',
     title: 'TRẺ EM',
     slug: '/tre-em',
+    image: '/images/categories/imagepr.webp',
     categories: kidsCategories,
   },
 ];
@@ -264,6 +313,7 @@ export const megaMenuData = {
   },
   collections: {
     title: 'BỘ SƯU TẬP',
+    image: '/images/categories/imagepr.webp',
     items: collections,
   },
 };
