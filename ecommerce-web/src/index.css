@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,6 +11,11 @@
 @theme{
   --text-2:8px;
 }
+
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
 body::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
 }
@@ -28,14 +35,14 @@ body::-webkit-scrollbar {
   -moz-osx-font-smoothing: grayscale; */
 }
 
-a {
+/* a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
 }
 a:hover {
   color: #535bf2;
-}
+} */
 .small-scrollbar {
     scrollbar-width: none;
     scrollbar-gutter: stable;
@@ -68,6 +75,33 @@ a:hover {
     font-weight: 500;
     line-height: 20px;
 }
+.border-border-primary {
+    border-color: #e5e7eb;
+}
+.text-theme-text {
+    color: #111928;
+}
+.text-price-md {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+}
+.text-price-lg {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24px;
+}
+.text-body-md {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+}
+.text-body-xl {
+        font-size: 20px;
+        font-weight: 400;
+        line-height: 30px;
+    }
+
 
 
 

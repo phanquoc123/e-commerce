@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './components/pages/HomePage/HomePage';
 import CartPage from './components/pages/CartPage/CartPage';
 import CheckoutPage from './components/pages/CheckoutPage/CheckoutPage';
+import ProductDetailPage from './components/pages/ProductDetailPage/ProductDetailPage';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/product" element={<ProductDetailPage />} />
         {/* Thêm các route khác ở đây */}
       </Routes>
     </BrowserRouter>
