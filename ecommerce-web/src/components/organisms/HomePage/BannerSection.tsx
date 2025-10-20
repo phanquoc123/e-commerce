@@ -3,11 +3,11 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 
 export default function BannerSection({ className }: { className?: string }) {
-  //   const bannersMobile = [
-  //     '/images/banner/banner-web1.webp',
-  //     '/images/banner/banner-web2.webp',
-  //     '/images/banner/banner-web3.webp',
-  //   ];
+  const bannersMobile = [
+    '/images/banner/banner-web1.webp',
+    '/images/banner/banner-web2.webp',
+    '/images/banner/banner-web3.webp',
+  ];
   const bannersDesktop = [
     '/images/banner/banner-web-destop.webp',
     '/images/banner/banner-web-destop2.webp',

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ProductImage from '../../atoms/ProductImage/ProductImage';
-import ProductInfo from '../../molecules/ProductInfo/ProductInfo';
+import ProductInfo from '../ProductInfo/ProductInfo';
 
 interface ProductCardProps {
   product: {
@@ -16,11 +16,11 @@ interface ProductCardProps {
   onColorSelect?: (color: string) => void;
 }
 
-export default function ProductCard({ 
-  product, 
-  className = '', 
+export default function ProductCard({
+  product,
+  className = '',
   onClick,
-  onColorSelect 
+  onColorSelect,
 }: ProductCardProps) {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
@@ -38,16 +38,10 @@ export default function ProductCard({
   };
 
   return (
-    <div 
-      className={`group cursor-pointer ${className}`}
-      onClick={onClick}
-    >
-      <ProductImage 
-        src={getCurrentImage()} 
-        alt={product.name}
-      />
-      <ProductInfo 
-        name={product.name} 
+    <div className={`w-40 min-w-40 lg:w-full lg:min-w-full ${className}`} onClick={onClick}>
+      <ProductImage src={getCurrentImage()} alt={product.name} />
+      <ProductInfo
+        name={product.name}
         price={product.price}
         colors={product.colors}
         selectedColor={selectedColor || undefined}

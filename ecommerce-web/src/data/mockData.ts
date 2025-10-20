@@ -318,7 +318,7 @@ export const megaMenuData = {
   },
 };
 
-export const mockProducts = Array.from({ length: 10 }, (_, i) => ({
+export const mockProducts = Array.from({ length: 5 }, (_, i) => ({
   id: `product-${i + 1}`,
   name: `Sản phẩm ${i + 1}`,
   price: `${(i + 1) * 100000}đ`,
@@ -331,3 +331,64 @@ export const mockProducts = Array.from({ length: 10 }, (_, i) => ({
     '#FFFF00': `https://images.unsplash.com/photo-${1500000000000 + i + 3}?w=200&h=200&fit=crop&sat=100`,
   },
 }));
+
+// Blog Posts Data
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  image: string;
+  publishDate: string;
+  excerpt?: string;
+}
+
+export const mockBlogPosts: BlogPost[] = [
+  {
+    id: 'blog-1',
+    title: 'HÀNH TRÌNH LAN TỎA YÊU THƯƠNG CỦA YODY ĐẾN VỚI BÀ CON BẮC NINH',
+    slug: '/post/hanh-trinh-lan-toa-yeu-thuong-cua-yody-den-bac-ninh',
+    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=500&h=300&fit=crop',
+    publishDate: '11/10/2025',
+    excerpt: 'YODY cùng đồng hành với bà con Bắc Ninh trong chương trình từ thiện ý nghĩa'
+  },
+  {
+    id: 'blog-2',
+    title: 'MUA 2 ÁO GIÓ NHẬN NGAY QUÀ TẶNG ÁO THUN HOẶC POLO - ƯU ĐÃI MỪNG RA MẮT BST THU ĐÔNG',
+    slug: '/post/mua-2-ao-gio-tang-qua',
+    image: 'https://images.unsplash.com/photo-1544966503-7cc4ac81b9a1?w=500&h=300&fit=crop',
+    publishDate: '9/10/2025',
+    excerpt: 'Ưu đãi đặc biệt cho bộ sưu tập Thu Đông mới nhất'
+  },
+  {
+    id: 'blog-3',
+    title: 'YODY CHÍNH THỨC RA MẮT BỘ SƯU TẬP THU ĐÔNG 2025 "DÒNG CHẢY KẾT NỐI"',
+    slug: '/post/yody-chinh-thuc-ra-mat-bo-suu-tap-thu-dong-2025',
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500&h=300&fit=crop',
+    publishDate: '9/10/2025',
+    excerpt: 'Khám phá bộ sưu tập Thu Đông với thiết kế hiện đại và chất liệu cao cấp'
+  },
+  {
+    id: 'blog-4',
+    title: 'Top 7 mẫu áo gió chạy bộ YODY đáng mua nhất 2025',
+    slug: '/post/ao-gio-chay-bo-yody',
+    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=300&fit=crop',
+    publishDate: '3/10/2025',
+    excerpt: 'Tổng hợp những mẫu áo gió chạy bộ được yêu thích nhất'
+  },
+  {
+    id: 'blog-5',
+    title: '2 NĂM LIÊN TIẾP YODY VINH DỰ LÀ THƯƠNG HIỆU THỜI TRANG VIỆT LỌT TOP 10 ĐÔNG NAM Á',
+    slug: '/post/yody-thuong-hieu-thoi-trang-viet-top-10-dong-nam-a',
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500&h=300&fit=crop',
+    publishDate: '3/10/2025',
+    excerpt: 'Thành tựu đáng tự hào của thương hiệu thời trang Việt Nam'
+  },
+  {
+    id: 'blog-6',
+    title: 'BST THU ĐÔNG AW25 - DÒNG CHẢY KẾT NỐI',
+    slug: '/post/bst-thu-dong-aw25-dong-chay-ket-noi',
+    image: 'https://images.unsplash.com/photo-1558769132-cb1aea1f1f88?w=500&h=300&fit=crop',
+    publishDate: '1/10/2025',
+    excerpt: 'Khám phá ngay bộ sưu tập Thu Đông với thiết kế độc đáo'
+  }
+];

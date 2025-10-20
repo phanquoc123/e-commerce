@@ -20,11 +20,14 @@ export default function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 mx-auto flex h-[60px] w-full items-center justify-between border-b border-transparent p-4 transition-colors duration-300 lg:px-12 lg:py-4 ${
+        className={`sticky top-0 z-50 mx-auto flex h-[60px] max-w-screen-sm items-center justify-between border-b border-transparent p-4 transition-colors duration-300 lg:max-w-full lg:px-12 lg:py-4 ${
           isScrolled ? 'border-gray-300 bg-white' : 'bg-transparent'
         }`}
       >
-        <CategoryButton onClick={() => setIsMegaMenuOpen(true)} />
+        <CategoryButton
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 transform lg:static lg:bottom-auto lg:left-auto lg:translate-x-0"
+          onClick={() => setIsMegaMenuOpen(true)}
+        />
         <Logo />
         <HeaderActions onSearchClick={() => setIsMegaMenuOpen(true)} />
       </header>

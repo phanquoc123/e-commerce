@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Swiper CSS */
+@import 'swiper/css';
+@import 'swiper/css/free-mode';
+
 @theme{
   --text-2:8px;
 }
@@ -38,6 +42,34 @@ a:hover {
     padding-right: 2px;
     transition: scrollbar-color .3s;
 }
+.text-heading-xl {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
+}
+.text-theme-text {
+    color: #111928;
+}
+.text-heading-3xl {
+        font-size: 36px;
+        font-weight: 700;
+        line-height: 54px;
+}
+.text-label-sm {
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 18px;
+}
+.text-theme-text-secondary {
+    color: #9ca3af;
+}
+.text-label-md {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+}
+
+
 
 @media (prefers-color-scheme: light) {
   :root {

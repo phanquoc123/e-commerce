@@ -1,5 +1,5 @@
 import { mockProducts } from '../../../data/mockData';
-import ProductCard from '../ProductCard/ProductCard';
+import ProductCard from '../../molecules/ProductCard/ProductCard';
 
 export default function SearchResult({ searchQuery }: { searchQuery: string }) {
   return (
