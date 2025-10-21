@@ -1,7 +1,7 @@
 export default function Breadcrums() {
   return (
     <>
-      <nav className="border-border-primary hidden border-b px-12 py-4 lg:block">
+      <nav className="border-border-primary hidden border-b border-t px-12 py-4 lg:block">
         <ol className="flex flex-wrap items-center gap-2 break-words text-[14px] font-medium leading-5">
           <li className="inline-flex items-center gap-2">
             <span className="text-theme-text-secondary hidden">/</span>

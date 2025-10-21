@@ -1,35 +1,35 @@
-import ProductTitle from '../../atoms/ProductTitle/ProductTitle';
-import ProductPrice from '../../atoms/ProductPrice/ProductPrice';
-import ProductColor from '../../atoms/ProductColor/ProductColor';
-
 interface ProductInfoProps {
   name: string;
-  price: string;
-  colors?: string[];
-  selectedColor?: string;
-  onColorSelect?: (color: string) => void;
-  className?: string;
+  price: number;
+  originalPrice?: number;
+  discount?: number;
+  sku: string;
 }
 
-export default function ProductInfo({ 
-  name, 
-  price, 
-  colors = ['#E60023', '#6CFF02', '#36017F'],
-  selectedColor,
-  onColorSelect,
-  className = '' 
-}: ProductInfoProps) {
+export default function ProductInfo({ name, price, originalPrice, discount, sku }: ProductInfoProps) {
   return (
-    <div className={`mt-2 ${className}`}>
-      <ProductTitle title={name} />
-      <ProductPrice price={price} />
-      <div className="mt-1">
-        <ProductColor 
-          colors={colors}
-          selectedColor={selectedColor}
-          onColorSelect={onColorSelect}
-        />
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-right">
+        <p className="text-price-lg lg:text-price-xl !font-extrabold text-red-600">
+          {price.toLocaleString('vi-VN')}đ
+        </p>
+        {originalPrice && (
+          <p className="text-price-md text-theme-text-secondary lg:text-price-lg line-through">
+            {originalPrice.toLocaleString('vi-VN')}đ
+          </p>
+        )}
+        {discount && (
+          <div className="text-label-sm inline-flex items-center gap-[2px] rounded-md bg-red-600 px-1 py-[2px] text-white lg:rounded-sm">
+            -{discount}%
+          </div>
+        )}
       </div>
+      <h1 className="text-body-md lg:text-body-xl line-clamp-1 lg:line-clamp-2">
+        {name}
+      </h1>
+      <p className="text-body-sm text-theme-text-secondary my-3 flex items-center gap-1">
+        {sku}
+      </p>
     </div>
   );
 }
