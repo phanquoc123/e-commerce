@@ -107,6 +107,11 @@ a:hover {
         font-weight: 400;
         line-height: 30px;
     }
+.text-price-xl {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 30px;
+}
 .bg-brand-surface {
     background-color: #ffc84a;
   }
@@ -125,14 +130,14 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* Custom Swiper Styles */
+/* Custom Swiper Styles
 .swiper-slide {
   width: auto !important;
 }
 
 .swiper-vertical > .swiper-wrapper {
   flex-direction: column;
-}
+} */
 
 
 

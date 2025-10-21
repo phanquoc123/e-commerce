@@ -125,8 +125,6 @@ export default function ProductDetailPage() {
             />
             <StoreCommitment />
           </div>
-
-          {/* Store Commitment */}
         </div>
       </main>
     </MainLayout>
