@@ -9,7 +9,6 @@ export default function BannerProduct({ href, src }: BannerProductProps) {
       <a href={href}>
         <img className="rounded-xl" src={src} alt="" loading="lazy" />
       </a>
-      ;
     </>
   );
 }

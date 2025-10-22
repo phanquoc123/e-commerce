@@ -12,7 +12,9 @@ export default function HeaderActions({ onSearchClick }: HeaderActionsProps) {
       <div className="cursor-pointer">
         <SearchBar onClick={onSearchClick} />
       </div>
-      <FontAwesomeIcon icon={faCartShopping} width={24} height={24} />
+      <a href="/cart">
+        <FontAwesomeIcon className="h-[25px] w-[34px] lg:h-6 lg:w-6" icon={faCartShopping} />
+      </a>
     </div>
   );
 }
