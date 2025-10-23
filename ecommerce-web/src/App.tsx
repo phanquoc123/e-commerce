@@ -12,6 +12,7 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/product" element={<ProductDetailPage />} />
+        <Route path="/order" element={<CheckoutPage />} />
         {/* Thêm các route khác ở đây */}
       </Routes>
     </BrowserRouter>
