@@ -1,3 +1,5 @@
+import ActionButton from '../../molecules/ActionButton/ActionButton';
+
 interface CartSummaryProps {
   itemCount: number;
   subtotal: number;
@@ -97,28 +99,15 @@ export default function CartSummary({
       </div>
       
       {/* Button đặt hàng */}
-      <button
+      <ActionButton
         onClick={onCheckout}
         disabled={itemCount === 0}
-        className="focus-visible:ring-ring [&_svg]:pointer-events-none [&_svg]:shrink-0 bg-brand-surface text-theme-text hover:bg-brand-surface-hover [&_svg]:text-theme-text text-label-md [&_svg]:size-5 inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 py-3 font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50"
-        aria-label="order"
+        fullWidth
+        className="rounded-full"
+        ariaLabel="order"
       >
         Đặt hàng
-        <span className="focus-visible:ring-ring rounded-rounded [&_svg]:pointer-events-none [&_svg]:shrink-0 inline-flex size-5 min-w-5 items-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-            data-slot="icon"
-            className="size-5"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-          </svg>
-        </span>
-      </button>
+      </ActionButton>
     </div>
   );
 }

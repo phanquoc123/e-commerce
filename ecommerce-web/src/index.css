@@ -80,6 +80,12 @@ a:hover {
 .border-border-primary {
     border-color: #e5e7eb;
 }
+.text-label-lg
+{
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+}
 .text-theme-text {
     color: #111928;
 }
@@ -128,6 +134,13 @@ a:hover {
     font-size: 16px;
     font-weight: 700;
     line-height: 24px;
+}
+.text-success-text{
+  color:#00ab56
+
+}
+.text-brandsecondary-text{
+  color: #3f3f99;
 }
 
  /* Hide number input arrows */
