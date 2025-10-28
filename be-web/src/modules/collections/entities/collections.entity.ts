@@ -53,5 +53,5 @@ export class CollectionEntity {
 
   // Relations
   @OneToMany('CollectionProductEntity', 'collection')
-  products: any[];
+  collectionProducts: any[];
 }

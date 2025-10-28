@@ -25,10 +25,15 @@ export class ColorEntity {
   @ApiProperty({ example: 'red' })
   code: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  @Expose()
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  @Expose({ name: 'hex_code' })
+  @ApiProperty({ example: '#FF0000' })
+  hexCode: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Expose({ name: 'thumbnail_url' })
   @ApiProperty({ example: 'https://example.com/red-color.jpg' })
-  image: string | null;
+  thumbnailUrl: string | null;
 
   @CreateDateColumn({ type: 'datetime' })
   @Expose()

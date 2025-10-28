@@ -3,7 +3,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
@@ -29,23 +28,18 @@ export class CollectionProductEntity {
   @ApiProperty({ example: 1 })
   productId: number;
 
-  @Column({ type: 'bigint', unsigned: true, default: 0 })
-  @Expose({ name: 'display_order' })
+  @Column({ type: 'int', nullable: false, default: 0 })
+  @Expose({ name: 'sort_order' })
   @ApiProperty({ example: 0 })
-  displayOrder: number;
+  sortOrder: number;
 
   @CreateDateColumn({ type: 'datetime' })
   @Expose({ name: 'created_at' })
   @ApiProperty()
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'datetime' })
-  @Expose({ name: 'updated_at' })
-  @ApiProperty()
-  updatedAt: Date;
-
   // Relations
-  @ManyToOne(() => CollectionEntity, (collection) => collection.products)
+  @ManyToOne(() => CollectionEntity, (collection) => collection.collectionProducts)
   @JoinColumn({ name: 'collectionId' })
   collection: CollectionEntity;
 
@@ -53,3 +47,4 @@ export class CollectionProductEntity {
   @JoinColumn({ name: 'productId' })
   product: ProductEntity;
 }
+

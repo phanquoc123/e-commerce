@@ -16,7 +16,11 @@ import { CreateCategoryDto } from '../dtos/create-category.dto';
 import { UpdateCategoryDto } from '../dtos/update-category.dto';
 import { CategoryEntity } from '../entities/categories.entity';
 import { plainToInstance } from 'class-transformer';
-import { CATEGORY_EXAMPLES, API_RESPONSE_EXAMPLES, PAGINATION_EXAMPLES } from '../../../common/constants/api-examples';
+import {
+  CATEGORY_EXAMPLES,
+  API_RESPONSE_EXAMPLES,
+  PAGINATION_EXAMPLES,
+} from '../../../common/constants/api-examples';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
 
 @ApiTags('categories')
@@ -30,7 +34,9 @@ export class CategoryController {
   @ApiOkResponse({
     description: 'Created category',
     schema: {
-      example: API_RESPONSE_EXAMPLES.SUCCESS_RESPONSE(CATEGORY_EXAMPLES.SINGLE_CATEGORY),
+      example: API_RESPONSE_EXAMPLES.SUCCESS_RESPONSE(
+        CATEGORY_EXAMPLES.SINGLE_CATEGORY,
+      ),
     },
   })
   async create(@Body() dto: CreateCategoryDto) {
@@ -49,40 +55,41 @@ export class CategoryController {
     schema: {
       example: API_RESPONSE_EXAMPLES.PAGINATED_RESPONSE(
         CATEGORY_EXAMPLES.CATEGORY_LIST,
-        PAGINATION_EXAMPLES.paginate
+        PAGINATION_EXAMPLES.paginate,
       ),
     },
   })
   async findAll(@Query() paginationDto: PaginationDto) {
     const result = await this.categoryService.findAllPaginated(paginationDto);
-    
+
     return {
       data: result.data.map((e) =>
-        plainToInstance(CategoryEntity, e, { excludeExtraneousValues: true })
+        plainToInstance(CategoryEntity, e, { excludeExtraneousValues: true }),
       ),
       paginate: result.paginate,
     };
   }
 
-  @Get('all')
-  @ResponseMessage('Get all categories successfully')
-  @ApiOkResponse({
-    description: 'List all categories without pagination',
-    schema: {
-      example: API_RESPONSE_EXAMPLES.SUCCESS_RESPONSE(CATEGORY_EXAMPLES.CATEGORY_LIST),
-    },
-  })
-  async findAllWithoutPagination() {
-    const list = await this.categoryService.findAll();
-    return list.map((e) =>
-      plainToInstance(CategoryEntity, e, { excludeExtraneousValues: true }),
-    );
-  }
+  // @Get('all')
+  // @ResponseMessage('Get all categories successfully')
+  // @ApiOkResponse({
+  //   description: 'List all categories without pagination',
+  //   schema: {
+  //     example: API_RESPONSE_EXAMPLES.SUCCESS_RESPONSE(CATEGORY_EXAMPLES.CATEGORY_LIST),
+  //   },
+  // })
+  // async findAllWithoutPagination() {
+  //   const list = await this.categoryService.findAll();
+  //   return list.map((e) =>
+  //     plainToInstance(CategoryEntity, e, { excludeExtraneousValues: true }),
+  //   );
+  // }
 
   @Get('tree')
   @ResponseMessage('Get categories tree successfully')
   @ApiOkResponse({
-    description: 'Get categories in nested tree structure with parent-child relationships',
+    description:
+      'Get categories in nested tree structure with parent-child relationships',
     schema: {
       example: API_RESPONSE_EXAMPLES.SUCCESS_RESPONSE([
         {
@@ -107,16 +114,17 @@ export class CategoryController {
                   id: 13,
                   name: 'Áo chống nắng nam',
                   slug: 'ao-chong-nang-nam',
-                  thumbnail: 'https://example.com/ao-chong-nang-nam-thumbnail.jpg',
+                  thumbnail:
+                    'https://example.com/ao-chong-nang-nam-thumbnail.jpg',
                   parent_id: 8,
                   is_active: true,
                   sort_order: 1,
-                  children: []
-                }
-              ]
-            }
-          ]
-        }
+                  children: [],
+                },
+              ],
+            },
+          ],
+        },
       ]),
     },
   })
@@ -129,7 +137,9 @@ export class CategoryController {
   @ApiOkResponse({
     description: 'Get category by id',
     schema: {
-      example: API_RESPONSE_EXAMPLES.SUCCESS_RESPONSE(CATEGORY_EXAMPLES.SINGLE_CATEGORY),
+      example: API_RESPONSE_EXAMPLES.SUCCESS_RESPONSE(
+        CATEGORY_EXAMPLES.SINGLE_CATEGORY,
+      ),
     },
   })
   async findOne(@Param('id', ParseIntPipe) id: number) {
@@ -145,7 +155,9 @@ export class CategoryController {
   @ApiOkResponse({
     description: 'Updated category',
     schema: {
-      example: API_RESPONSE_EXAMPLES.SUCCESS_RESPONSE(CATEGORY_EXAMPLES.UPDATED_CATEGORY),
+      example: API_RESPONSE_EXAMPLES.SUCCESS_RESPONSE(
+        CATEGORY_EXAMPLES.UPDATED_CATEGORY,
+      ),
     },
   })
   async update(

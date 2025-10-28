@@ -9,8 +9,7 @@ import {
 } from 'typeorm';
 import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { ProductEntity } from '../../products/entities/products.entity';
-import { ProductVariantEntity } from '../../product-variants/entities/product-variants.entity';
+import { ProductColorEntity } from '../../product-colors/entities/product-colors.entity';
 
 @Entity({ name: 'product_images' })
 export class ProductImageEntity {
@@ -20,14 +19,9 @@ export class ProductImageEntity {
   id: number;
 
   @Column({ type: 'bigint', unsigned: true, nullable: false })
-  @Expose({ name: 'product_id' })
+  @Expose({ name: 'product_color_id' })
   @ApiProperty({ example: 1 })
-  productId: number;
-
-  @Column({ type: 'bigint', unsigned: true, nullable: true })
-  @Expose({ name: 'variant_id' })
-  @ApiProperty({ example: 1 })
-  variantId: number | null;
+  productColorId: number;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   @Expose({ name: 'image_url' })
@@ -38,6 +32,11 @@ export class ProductImageEntity {
   @Expose({ name: 'is_main' })
   @ApiProperty({ example: false })
   isMain: boolean;
+
+  @Column({ type: 'int', default: 0 })
+  @Expose({ name: 'sort_order' })
+  @ApiProperty({ example: 0 })
+  sortOrder: number;
 
   @CreateDateColumn({ type: 'datetime' })
   @Expose({ name: 'created_at' })
@@ -50,11 +49,7 @@ export class ProductImageEntity {
   updatedAt: Date;
 
   // Relations
-  @ManyToOne(() => ProductEntity)
-  @JoinColumn({ name: 'productId' })
-  product: ProductEntity;
-
-  @ManyToOne(() => ProductVariantEntity, { nullable: true })
-  @JoinColumn({ name: 'variantId' })
-  variant: ProductVariantEntity | null;
+  @ManyToOne(() => ProductColorEntity, (productColor) => productColor.images)
+  @JoinColumn({ name: 'productColorId' })
+  productColor: ProductColorEntity;
 }

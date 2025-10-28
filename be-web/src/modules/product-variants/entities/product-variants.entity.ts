@@ -10,8 +10,8 @@ import {
 import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { ProductEntity } from '../../products/entities/products.entity';
-import { ColorEntity } from '../../colors/entities/colors.entity';
-import { SizeEntity } from '../../sizes/entities/sizes.entity';
+import { ProductColorEntity } from '../../product-colors/entities/product-colors.entity';
+import { ProductSizeEntity } from '../../product-sizes/entities/product-sizes.entity';
 
 @Entity({ name: 'product_variants' })
 export class ProductVariantEntity {
@@ -25,7 +25,17 @@ export class ProductVariantEntity {
   @ApiProperty({ example: 1 })
   productId: number;
 
-  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
+  @Column({ type: 'bigint', unsigned: true, nullable: true })
+  @Expose({ name: 'color_id' })
+  @ApiProperty({ example: 1 })
+  colorId: number | null;
+
+  @Column({ type: 'bigint', unsigned: true, nullable: true })
+  @Expose({ name: 'size_id' })
+  @ApiProperty({ example: 1 })
+  sizeId: number | null;
+
+  @Column({ type: 'varchar', length: 100, nullable: false, unique: true })
   @Expose()
   @ApiProperty({ example: 'ATN-RED-M' })
   sku: string;
@@ -35,25 +45,19 @@ export class ProductVariantEntity {
   @ApiProperty({ example: 299000 })
   price: number;
 
-  @Column({ type: 'bigint', unsigned: true, default: 0 })
+  @Column({ type: 'int', default: 0 })
   @Expose()
   @ApiProperty({ example: 100 })
-  available: number;
+  stock: number;
 
-  @Column({ type: 'bigint', unsigned: true, nullable: false })
-  @Expose({ name: 'color_id' })
-  @ApiProperty({ example: 1 })
-  colorId: number;
-
-  @Column({ type: 'bigint', unsigned: true, nullable: false })
-  @Expose({ name: 'size_id' })
-  @ApiProperty({ example: 1 })
-  sizeId: number;
-
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  @Expose({ name: 'image_url' })
-  @ApiProperty({ example: 'https://example.com/product-variant.jpg' })
-  imageUrl: string | null;
+  @Column({
+    type: 'enum',
+    enum: ['active', 'inactive'],
+    default: 'active',
+  })
+  @Expose()
+  @ApiProperty({ example: 'active' })
+  status: 'active' | 'inactive';
 
   @CreateDateColumn({ type: 'datetime' })
   @Expose({ name: 'created_at' })
@@ -70,11 +74,13 @@ export class ProductVariantEntity {
   @JoinColumn({ name: 'productId' })
   product: ProductEntity;
 
-  @ManyToOne(() => ColorEntity)
+  @ManyToOne(() => ProductColorEntity, (productColor) => productColor.variants, {
+    nullable: true,
+  })
   @JoinColumn({ name: 'colorId' })
-  color: ColorEntity;
+  productColor: ProductColorEntity | null;
 
-  @ManyToOne(() => SizeEntity)
+  @ManyToOne(() => ProductSizeEntity, { nullable: true })
   @JoinColumn({ name: 'sizeId' })
-  size: SizeEntity;
+  productSize: ProductSizeEntity | null;
 }
