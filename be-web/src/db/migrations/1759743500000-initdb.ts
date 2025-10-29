@@ -138,11 +138,11 @@ export class Initdb1759743500000 implements MigrationInterface {
     // Carts table
     await queryRunner.query(`CREATE TABLE \`carts\` (
       \`id\` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
-      \`userId\` bigint UNSIGNED NOT NULL,
+      \`cartToken\` varchar(255) NOT NULL,
       \`createdAt\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
       \`updatedAt\` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       PRIMARY KEY (\`id\`),
-      INDEX \`IDX_carts_userId\` (\`userId\`)
+      INDEX \`IDX_carts_cartToken\` (\`cartToken\`)
     ) ENGINE=InnoDB`);
 
     // Cart Items table

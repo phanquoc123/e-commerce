@@ -17,10 +17,10 @@ export class CartEntity {
   @ApiProperty({ example: 1 })
   id: number;
 
-  @Column({ type: 'bigint', unsigned: true, nullable: false })
-  @Expose({ name: 'user_id' })
-  @ApiProperty({ example: 1 })
-  userId: number;
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  @Expose({ name: 'cart_token' })
+  @ApiProperty({ example: 'e5c2f8b1-2f9a-4c7f-9c0a-1f2d3e4a5b6c' })
+  cartToken: string;
 
   @CreateDateColumn({ type: 'datetime' })
   @Expose({ name: 'created_at' })

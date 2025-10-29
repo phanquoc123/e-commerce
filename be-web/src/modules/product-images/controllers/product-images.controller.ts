@@ -42,15 +42,9 @@ export class ProductImagesController {
   @Get()
   @ApiOperation({ summary: 'Lấy danh sách tất cả hình ảnh sản phẩm' })
   @ApiQuery({
-    name: 'productId',
+    name: 'productColorId',
     required: false,
-    description: 'Lọc theo sản phẩm',
-    type: Number,
-  })
-  @ApiQuery({
-    name: 'variantId',
-    required: false,
-    description: 'Lọc theo biến thể sản phẩm',
+    description: 'Lọc theo màu sắc sản phẩm',
     type: Number,
   })
   @ApiResponse({
@@ -59,14 +53,10 @@ export class ProductImagesController {
     type: [ProductImageEntity],
   })
   findAll(
-    @Query('productId') productId?: number,
-    @Query('variantId') variantId?: number,
+    @Query('productColorId') productColorId?: number,
   ): Promise<ProductImageEntity[]> {
-    if (productId) {
-      return this.productImagesService.findByProduct(productId);
-    }
-    if (variantId) {
-      return this.productImagesService.findByVariant(variantId);
+    if (productColorId) {
+      return this.productImagesService.findByProductColor(productColorId);
     }
     return this.productImagesService.findAll();
   }

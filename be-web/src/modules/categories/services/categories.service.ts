@@ -2,10 +2,15 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CategoryEntity } from '../entities/categories.entity';
-import { CreateCategoryDto } from '../dtos/create-category.dto';
-import { UpdateCategoryDto } from '../dtos/update-category.dto';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
-import { PaginatedResponseDto, PaginationMetaDto } from 'src/common/dtos/paginated-response.dto';
+import {
+  CreateCategoryParamsDto,
+  UpdateCategoryParamsDto,
+  SearchCategoryDto,
+} from '../dtos/category.params.dto';
+import {
+  PaginationParamsDto,
+  PaginationResponseDto,
+} from 'src/common/dtos/pagination.dto';
 
 @Injectable()
 export class CategoryService {
@@ -14,14 +19,14 @@ export class CategoryService {
     private readonly categoryRepository: Repository<CategoryEntity>,
   ) {}
 
-  async create(dto: CreateCategoryDto): Promise<CategoryEntity> {
+  async create(dto: CreateCategoryParamsDto): Promise<CategoryEntity> {
     const entity = this.categoryRepository.create({
       name: dto.name,
       slug: this.generateSlug(dto.name),
       thumbnail: dto.thumbnail ?? null,
-      parentId: dto.parent_id ?? null,
-      isActive: dto.is_active ?? true,
-      sortOrder: dto.sort_order ?? 0,
+      parentId: dto.parentId ?? null,
+      isActive: dto.isActive ?? true,
+      sortOrder: dto.sortOrder ?? 0,
     });
     return await this.categoryRepository.save(entity);
   }
@@ -56,30 +61,31 @@ export class CategoryService {
       relations: ['children'],
       order: {
         sortOrder: 'ASC',
+
         createdAt: 'DESC',
       },
     });
 
     // Tạo map để dễ dàng tìm kiếm
     const categoryMap = new Map();
-    allCategories.forEach(cat => {
+    allCategories.forEach((cat) => {
       categoryMap.set(cat.id, {
         id: cat.id,
         name: cat.name,
         slug: cat.slug,
         thumbnail: cat.thumbnail,
-        parent_id: cat.parentId,
-        is_active: cat.isActive,
-        sort_order: cat.sortOrder,
-        children: []
+        parentId: cat.parentId,
+        isActive: cat.isActive,
+        sortOrder: cat.sortOrder,
+        children: [],
       });
     });
 
     // Xây dựng cây hierarchy
     const rootCategories: any[] = [];
-    allCategories.forEach(cat => {
+    allCategories.forEach((cat) => {
       const categoryNode = categoryMap.get(cat.id);
-      
+
       if (cat.parentId === null) {
         // Đây là root category
         rootCategories.push(categoryNode);
@@ -93,9 +99,9 @@ export class CategoryService {
     });
 
     // Sắp xếp children theo sortOrder
-    const sortChildren = (categories) => {
-      categories.sort((a, b) => a.sort_order - b.sort_order);
-      categories.forEach(cat => {
+    const sortChildren = (categories: any[]) => {
+      categories.sort((a, b) => a.sortOrder - b.sortOrder);
+      categories.forEach((cat) => {
         if (cat.children.length > 0) {
           sortChildren(cat.children);
         }
@@ -103,36 +109,53 @@ export class CategoryService {
     };
 
     sortChildren(rootCategories);
-    return rootCategories;
+    return rootCategories.slice(0, 3);
   }
 
-  async findAllPaginated(paginationDto: PaginationDto): Promise<PaginatedResponseDto<CategoryEntity>> {
-    const { page = 1, limit = 10 } = paginationDto;
+  async findAllPaginated(
+    searchDto: SearchCategoryDto,
+  ): Promise<{ data: CategoryEntity[]; pagination: PaginationResponseDto }> {
+    const { page = 1, limit = 10, keyword, isActive, parentId } = searchDto;
     const skip = (page - 1) * limit;
 
-    const [data, total] = await this.categoryRepository.findAndCount({
-      skip,
-      take: limit,
-      order: {
-        sortOrder: 'ASC',
-        createdAt: 'DESC',
-      },
-    });
+    const queryBuilder = this.categoryRepository.createQueryBuilder('category');
 
-    const totalPages = Math.ceil(total / limit);
+    // Search by keyword
+    if (keyword) {
+      queryBuilder.andWhere(
+        '(category.name LIKE :keyword OR category.slug LIKE :keyword)',
+        { keyword: `%${keyword}%` },
+      );
+    }
 
-    const paginate: PaginationMetaDto = {
+    // Filter by isActive
+    if (isActive !== undefined) {
+      queryBuilder.andWhere('category.isActive = :isActive', { isActive });
+    }
+
+    // Filter by parentId
+    if (parentId !== undefined) {
+      queryBuilder.andWhere('category.parentId = :parentId', { parentId });
+    }
+
+    // Order and pagination
+    queryBuilder
+      .orderBy('category.sortOrder', 'ASC')
+      .addOrderBy('category.createdAt', 'DESC')
+      .skip(skip)
+      .take(limit);
+
+    const [data, total] = await queryBuilder.getManyAndCount();
+
+    const pagination: PaginationResponseDto = {
       page,
       limit,
       total,
-      totalPages,
-      hasNextPage: page < totalPages,
-      hasPrevPage: page > 1,
     };
 
     return {
       data,
-      paginate,
+      pagination,
     };
   }
 
@@ -142,31 +165,41 @@ export class CategoryService {
     return found;
   }
 
-  async update(id: number, dto: UpdateCategoryDto): Promise<CategoryEntity> {
+  async update(
+    id: number,
+    dto: UpdateCategoryParamsDto,
+  ): Promise<CategoryEntity> {
     const entity = await this.findOne(id);
     if (dto.name !== undefined) entity.name = dto.name;
     if (dto.name !== undefined) entity.slug = this.generateSlug(dto.name);
     if (dto.thumbnail !== undefined) entity.thumbnail = dto.thumbnail;
-    if (dto.parent_id !== undefined) entity.parentId = dto.parent_id as number | null;
-    if (dto.is_active !== undefined) entity.isActive = dto.is_active;
-    if (dto.sort_order !== undefined) entity.sortOrder = dto.sort_order;
+    if (dto.parentId !== undefined)
+      entity.parentId = dto.parentId as number | null;
+    if (dto.isActive !== undefined) entity.isActive = dto.isActive;
+    if (dto.sortOrder !== undefined) entity.sortOrder = dto.sortOrder;
     return await this.categoryRepository.save(entity);
   }
 
   async remove(id: number): Promise<void> {
     const found = await this.findOne(id);
-    await this.categoryRepository.softRemove(found);
+    await this.categoryRepository.remove(found);
   }
 
   private generateSlug(input: string): string {
-    const from = 'áàảãạăắằẳẵặâấầẩẫậđéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬĐÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỴ';
-    const to   = 'aaaaaaaaaaaaaaaaadeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyAAAAAAAAAAAAAAAAADEEEEEEEEEEEIIIIIOOOOOOOOOOOOOOOOOUUUUUUUUUUUYYYYY';
-    let str = input.split('').map((c) => {
-      const index = from.indexOf(c);
-      return index > -1 ? to[index] : c;
-    }).join('');
+    const from =
+      'áàảãạăắằẳẵặâấầẩẫậđéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬĐÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỴ';
+    const to =
+      'aaaaaaaaaaaaaaaaadeeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuuyyyyyAAAAAAAAAAAAAAAAADEEEEEEEEEEEIIIIIOOOOOOOOOOOOOOOOOUUUUUUUUUUUYYYYY';
+    let str = input
+      .split('')
+      .map((c) => {
+        const index = from.indexOf(c);
+        return index > -1 ? to[index] : c;
+      })
+      .join('');
     str = str
-      .normalize('NFD').replace(/\p{Diacritic}+/gu, '')
+      .normalize('NFD')
+      .replace(/\p{Diacritic}+/gu, '')
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .trim()
@@ -175,4 +208,3 @@ export class CategoryService {
     return str;
   }
 }
-

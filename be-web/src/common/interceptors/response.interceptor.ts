@@ -1,6 +1,11 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RESPONSE_MESSAGE } from '../decorators/response-message.decorator';
+import { RESPONSE_MESSAGE } from '../../core/decorators/response-message.decorator';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -11,7 +16,10 @@ export class ResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((result) => {
         const handler = context.getHandler();
-        const customMessage = this.reflector.get<string>(RESPONSE_MESSAGE, handler);
+        const customMessage = this.reflector.get<string>(
+          RESPONSE_MESSAGE,
+          handler,
+        );
         return {
           data: {
             status: 200,
@@ -24,5 +32,3 @@ export class ResponseInterceptor implements NestInterceptor {
     );
   }
 }
-
-

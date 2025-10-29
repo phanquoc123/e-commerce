@@ -1,22 +1,35 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { categoryService } from '../services/categoryService';
 
+// Backend response wrapper type
+interface ApiResponse<T> {
+  data: {
+    status: number;
+    message: string;
+    success: boolean;
+    result: T;
+  };
+}
+
 export interface Category {
   id: number;
   name: string;
   slug: string;
-  thumbnail?: string;
-  parent_id?: number | null;
-  is_active?: boolean;
-  sort_order?: number;
+  thumbnail: string | null;
+  parentId: number | null;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
   children?: Category[];
 }
 
 interface CreateCategoryData {
   name: string;
-  slug: string;
-  icon?: string;
-  parentId?: number;
+  thumbnail?: string | null;
+  parentId?: number | null;
+  isActive?: boolean;
+  sortOrder?: number;
 }
 
 // Query Keys
@@ -31,23 +44,21 @@ export const categoryKeys = {
 // Get all categories hook
 export const useCategories = () => {
   return useQuery({
-    queryKey: categoryKeys.all,
+    queryKey: ['categories'],
     queryFn: async () => {
       try {
-        console.log('🚀 Calling categories/tree API...');
         const response = await categoryService.getAllCategories();
         console.log('📦 Full response:', response);
-        console.log('📋 Response data:', response.data);
+        console.log('📋 Response.data:', response.data);
         
-        if (!response.data) {
-          console.error('❌ No data in response');
-          throw new Error('No data received from API');
-        }
+        // Backend response format: { data: { data: { result: [...] } } }
+        const result = response.data?.data?.result || response.data?.result || [];
+        console.log('✅ Parsed result:', result);
         
-        return response.data;
+        return result;
       } catch (error) {
         console.error('❌ Error in useCategories:', error);
-        throw error;
+        return []; // Return empty array to prevent undefined error
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -61,7 +72,8 @@ export const useCategory = (id: number) => {
     queryKey: categoryKeys.detail(id),
     queryFn: async () => {
       const response = await categoryService.getCategoryById(id);
-      return response.data;
+      const apiResponse = response.data as ApiResponse<Category>['data'];
+      return apiResponse.result;
     },
     enabled: !!id, // Only run query if id exists
   });
@@ -74,7 +86,8 @@ export const useCreateCategory = () => {
   return useMutation({
     mutationFn: async (data: CreateCategoryData) => {
       const response = await categoryService.createCategory(data);
-      return response.data;
+      const apiResponse = response.data as ApiResponse<Category>['data'];
+      return apiResponse.result;
     },
     onSuccess: () => {
       // Invalidate and refetch categories

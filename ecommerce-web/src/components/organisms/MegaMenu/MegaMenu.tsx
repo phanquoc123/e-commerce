@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { megaMenuData, genderCategoriesData } from '../../../data/mockData';
-import type { Category } from '../../../data/mockData';
+import { useEffect, useState, useMemo } from 'react';
+import { megaMenuData } from '../../../data/mockData';
+import type { Category as MockCategory } from '../../../data/mockData';
 import NavigationBar from '../NavigationBar/NavigationBar';
 import InputSearchLarge from '../../atoms/InputSearchLarge/InputSearchLarge';
 import BlackLine from '../../atoms/BlackLine/BlackLine';
@@ -9,6 +9,7 @@ import SubCategoriesList from '../SubCategoriesList/SubCategoriesList';
 import CollectionsSection from '../../molecules/CollectionsSection/CollectionsSection';
 import GenderCategorySection from '../../molecules/GenderCategorySection/GenderCategorySection';
 import SearchResult from '../SearchResult/SearchResult';
+import { useCategories, type Category as ApiCategory } from '../../../hooks/useCategory';
 
 interface MegaMenuProps {
   isOpen: boolean;
@@ -23,7 +24,34 @@ export default function MegaMenu({ isOpen, onClose, className = '' }: MegaMenuPr
   const [isOpenSubCategory, setIsOpenSubCategory] = useState(false);
   const [selectedCategoryName, setSelectedCategoryName] = useState('');
   const [selectedCategoryImage, setSelectedCategoryImage] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<MockCategory[]>([]);
+
+  // Fetch categories from API
+  const { data: apiCategories = [], isLoading } = useCategories();
+
+  // Transform API data to match component structure
+  const genderCategories = useMemo(() => {
+    if (!apiCategories || apiCategories.length === 0) return [];
+
+    // Map API categories (root level) to GenderCategory format
+    return apiCategories.map((rootCategory: ApiCategory) => ({
+      id: String(rootCategory.id),
+      title: rootCategory.name,
+      slug: `/${rootCategory.slug}`,
+      image: rootCategory.thumbnail || '',
+      categories: (rootCategory.children || []).map((child: ApiCategory) => ({
+        id: String(child.id),
+        name: child.name,
+        slug: `/${child.slug}`,
+        icon: child.thumbnail || '',
+        subCategories: (child.children || []).map((subChild: ApiCategory) => ({
+          id: String(subChild.id),
+          name: subChild.name,
+          slug: `/${subChild.slug}`,
+        })),
+      })),
+    }));
+  }, [apiCategories]);
 
   useEffect(() => {
     if (isOpen) {
@@ -39,9 +67,6 @@ export default function MegaMenu({ isOpen, onClose, className = '' }: MegaMenuPr
       setSelectedCategories([]); // Reset selected categories
     }
   }, [isOpen]);
-
-  // Gender categories data (từ API)
-  const genderCategories = genderCategoriesData;
 
   if (!isOpen) return null;
 
@@ -81,23 +106,33 @@ export default function MegaMenu({ isOpen, onClose, className = '' }: MegaMenuPr
           ) : (
             // Show categories grid
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-4">
-              {/* Gender Categories (NAM, NỮ, TRẺ EM) */}
-              {genderCategories.map(genderCategory => (
-                <GenderCategorySection
-                  key={genderCategory.id}
-                  id={genderCategory.id}
-                  title={genderCategory.title}
-                  slug={genderCategory.slug}
-                  image={genderCategory.image || ''}
-                  categories={genderCategory.categories}
-                  onChevronClick={() => {
-                    setSelectedCategoryName(genderCategory.title);
-                    setSelectedCategoryImage(genderCategory.image || '');
-                    setSelectedCategories(genderCategory.categories);
-                    setIsOpenSubCategory(!isOpenSubCategory);
-                  }}
-                />
-              ))}
+              {/* Gender Categories from API */}
+              {isLoading ? (
+                <div className="col-span-3 flex items-center justify-center py-12">
+                  <p className="text-gray-500">Đang tải danh mục...</p>
+                </div>
+              ) : genderCategories.length === 0 ? (
+                <div className="col-span-3 flex items-center justify-center py-12">
+                  <p className="text-gray-500">Chưa có danh mục nào</p>
+                </div>
+              ) : (
+                genderCategories.map((genderCategory: any) => (
+                  <GenderCategorySection
+                    key={genderCategory.id}
+                    id={genderCategory.id}
+                    title={genderCategory.title}
+                    slug={genderCategory.slug}
+                    image={genderCategory.image || ''}
+                    categories={genderCategory.categories}
+                    onChevronClick={() => {
+                      setSelectedCategoryName(genderCategory.title);
+                      setSelectedCategoryImage(genderCategory.image || '');
+                      setSelectedCategories(genderCategory.categories);
+                      setIsOpenSubCategory(!isOpenSubCategory);
+                    }}
+                  />
+                ))
+              )}
 
               {/* BỘ SƯU TẬP Column */}
               <CollectionsSection

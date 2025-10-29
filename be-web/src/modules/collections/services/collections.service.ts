@@ -21,7 +21,9 @@ export class CollectionsService {
     private readonly collectionProductRepository: Repository<CollectionProductEntity>,
   ) {}
 
-  async create(createCollectionDto: CreateCollectionDto): Promise<CollectionEntity> {
+  async create(
+    createCollectionDto: CreateCollectionDto,
+  ): Promise<CollectionEntity> {
     const collection = this.collectionRepository.create(createCollectionDto);
     return await this.collectionRepository.save(collection);
   }
@@ -47,13 +49,15 @@ export class CollectionsService {
           .createQueryBuilder('cp')
           .leftJoinAndSelect('cp.product', 'product')
           .leftJoinAndSelect('product.category', 'category')
-          .where('cp.collectionId = :collectionId', { collectionId: collection.id })
-          .orderBy('cp.displayOrder', 'ASC')
+          .where('cp.collectionId = :collectionId', {
+            collectionId: collection.id,
+          })
+          .orderBy('cp.sortOrder', 'ASC')
           .addOrderBy('cp.createdAt', 'DESC')
           .limit(productLimit)
           .getMany();
 
-        const products = collectionProducts.map(cp => ({
+        const products = collectionProducts.map((cp) => ({
           id: cp.product.id,
           name: cp.product.name,
           slug: cp.product.slug,
@@ -65,7 +69,7 @@ export class CollectionsService {
             name: cp.product.category.name,
             slug: cp.product.category.slug,
           },
-          displayOrder: cp.displayOrder,
+          displayOrder: cp.sortOrder,
           createdAt: cp.product.createdAt,
           updatedAt: cp.product.updatedAt,
         }));
@@ -75,7 +79,7 @@ export class CollectionsService {
           products,
           productCount: collectionProducts.length,
         };
-      })
+      }),
     );
 
     return collectionsWithProducts;
@@ -95,14 +99,16 @@ export class CollectionsService {
           .createQueryBuilder('cp')
           .leftJoinAndSelect('cp.product', 'product')
           .leftJoinAndSelect('product.category', 'category')
-          .where('cp.collectionId = :collectionId', { collectionId: collection.id })
+          .where('cp.collectionId = :collectionId', {
+            collectionId: collection.id,
+          })
           .andWhere('product.isActive = :isActive', { isActive: true })
-          .orderBy('cp.displayOrder', 'ASC')
+          .orderBy('cp.sortOrder', 'ASC')
           .addOrderBy('cp.createdAt', 'DESC')
           .limit(productLimit)
           .getMany();
 
-        const products = collectionProducts.map(cp => ({
+        const products = collectionProducts.map((cp) => ({
           id: cp.product.id,
           name: cp.product.name,
           slug: cp.product.slug,
@@ -114,7 +120,7 @@ export class CollectionsService {
             name: cp.product.category.name,
             slug: cp.product.category.slug,
           },
-          displayOrder: cp.displayOrder,
+          displayOrder: cp.sortOrder,
           createdAt: cp.product.createdAt,
           updatedAt: cp.product.updatedAt,
         }));
@@ -124,14 +130,14 @@ export class CollectionsService {
           name: collection.name,
           slug: collection.slug,
           description: collection.description,
-          thumbnail: collection.thumbnail,
+          thumbnailUrl: collection.thumbnailUrl,
           isActive: collection.isActive,
           createdAt: collection.createdAt,
           updatedAt: collection.updatedAt,
           products,
           productCount: collectionProducts.length,
         };
-      })
+      }),
     );
 
     return {
@@ -153,9 +159,12 @@ export class CollectionsService {
     return collection;
   }
 
-  async update(id: number, updateCollectionDto: UpdateCollectionDto): Promise<CollectionEntity> {
+  async update(
+    id: number,
+    updateCollectionDto: UpdateCollectionDto,
+  ): Promise<CollectionEntity> {
     const collection = await this.findOne(id);
-    
+
     Object.assign(collection, updateCollectionDto);
     return await this.collectionRepository.save(collection);
   }
@@ -165,14 +174,19 @@ export class CollectionsService {
     await this.collectionRepository.delete(id);
   }
 
-  async getProductsByCollection(collectionId: number, options: GetProductsOptions) {
+  async getProductsByCollection(
+    collectionId: number,
+    options: GetProductsOptions,
+  ) {
     // Kiểm tra collection có tồn tại không
     const collection = await this.collectionRepository.findOne({
       where: { id: collectionId },
     });
 
     if (!collection) {
-      throw new NotFoundException(`Collection with ID ${collectionId} not found`);
+      throw new NotFoundException(
+        `Collection with ID ${collectionId} not found`,
+      );
     }
 
     const { page, limit, search } = options;
@@ -189,7 +203,9 @@ export class CollectionsService {
 
     // Thêm điều kiện tìm kiếm nếu có
     if (search) {
-      queryBuilder.andWhere('product.name LIKE :search', { search: `%${search}%` });
+      queryBuilder.andWhere('product.name LIKE :search', {
+        search: `%${search}%`,
+      });
     }
 
     // Lấy tổng số records
@@ -202,7 +218,7 @@ export class CollectionsService {
       .getMany();
 
     // Chuyển đổi dữ liệu để trả về
-    const products = collectionProducts.map(cp => ({
+    const products = collectionProducts.map((cp) => ({
       id: cp.product.id,
       name: cp.product.name,
       slug: cp.product.slug,
@@ -214,7 +230,7 @@ export class CollectionsService {
         name: cp.product.category.name,
         slug: cp.product.category.slug,
       },
-      displayOrder: cp.displayOrder,
+      displayOrder: cp.sortOrder,
       createdAt: cp.product.createdAt,
       updatedAt: cp.product.updatedAt,
     }));

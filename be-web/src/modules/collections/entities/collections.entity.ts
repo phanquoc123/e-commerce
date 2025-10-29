@@ -34,7 +34,7 @@ export class CollectionEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   @Expose()
   @ApiProperty({ example: 'https://example.com/collection-thumbnail.jpg' })
-  thumbnail: string | null;
+  thumbnailUrl: string | null;
 
   @Column({ type: 'tinyint', width: 1, default: 1 })
   @Expose({ name: 'is_active' })

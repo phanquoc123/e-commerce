@@ -3,20 +3,12 @@ import { IsString, IsNotEmpty, MaxLength, IsOptional, IsNumber, IsBoolean } from
 
 export class CreateProductImageDto {
   @ApiProperty({
-    description: 'ID sản phẩm',
+    description: 'ID màu sắc sản phẩm',
     example: 1,
   })
   @IsNumber()
   @IsNotEmpty()
-  productId: number;
-
-  @ApiPropertyOptional({
-    description: 'ID biến thể sản phẩm (nếu ảnh dành riêng cho biến thể)',
-    example: 1,
-  })
-  @IsOptional()
-  @IsNumber()
-  variantId?: number;
+  productColorId: number;
 
   @ApiProperty({
     description: 'URL hình ảnh',
@@ -35,4 +27,13 @@ export class CreateProductImageDto {
   @IsOptional()
   @IsBoolean()
   isMain?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Thứ tự sắp xếp',
+    example: 0,
+    default: 0,
+  })
+  @IsOptional()
+  @IsNumber()
+  sortOrder?: number;
 }

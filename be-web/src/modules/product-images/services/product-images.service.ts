@@ -13,10 +13,10 @@ export class ProductImagesService {
   ) {}
 
   async create(createProductImageDto: CreateProductImageDto): Promise<ProductImageEntity> {
-    // Nếu đặt làm ảnh chính, bỏ isMain của các ảnh khác
+    // Nếu đặt làm ảnh chính, bỏ isMain của các ảnh khác cùng productColor
     if (createProductImageDto.isMain) {
       await this.productImageRepository.update(
-        { productId: createProductImageDto.productId },
+        { productColorId: createProductImageDto.productColorId },
         { isMain: false }
       );
     }
@@ -27,7 +27,7 @@ export class ProductImagesService {
 
   async findAll(): Promise<ProductImageEntity[]> {
     return await this.productImageRepository.find({
-      relations: ['product', 'variant'],
+      relations: ['productColor'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -35,7 +35,7 @@ export class ProductImagesService {
   async findOne(id: number): Promise<ProductImageEntity> {
     const productImage = await this.productImageRepository.findOne({
       where: { id },
-      relations: ['product', 'variant'],
+      relations: ['productColor'],
     });
 
     if (!productImage) {
@@ -48,10 +48,10 @@ export class ProductImagesService {
   async update(id: number, updateProductImageDto: UpdateProductImageDto): Promise<ProductImageEntity> {
     const productImage = await this.findOne(id);
     
-    // Nếu đặt làm ảnh chính, bỏ isMain của các ảnh khác
-    if (updateProductImageDto.isMain && updateProductImageDto.productId) {
+    // Nếu đặt làm ảnh chính, bỏ isMain của các ảnh khác cùng productColor
+    if (updateProductImageDto.isMain && updateProductImageDto.productColorId) {
       await this.productImageRepository.update(
-        { productId: updateProductImageDto.productId },
+        { productColorId: updateProductImageDto.productColorId },
         { isMain: false }
       );
     }
@@ -65,18 +65,10 @@ export class ProductImagesService {
     await this.productImageRepository.remove(productImage);
   }
 
-  async findByProduct(productId: number): Promise<ProductImageEntity[]> {
+  async findByProductColor(productColorId: number): Promise<ProductImageEntity[]> {
     return await this.productImageRepository.find({
-      where: { productId },
-      relations: ['product', 'variant'],
-      order: { isMain: 'DESC', createdAt: 'DESC' },
-    });
-  }
-
-  async findByVariant(variantId: number): Promise<ProductImageEntity[]> {
-    return await this.productImageRepository.find({
-      where: { variantId },
-      relations: ['product', 'variant'],
+      where: { productColorId },
+      relations: ['productColor'],
       order: { isMain: 'DESC', createdAt: 'DESC' },
     });
   }

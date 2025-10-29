@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Expose } from 'class-transformer';
 import { BaseEntityWithTimestamps } from '../../../common/entities/base-timestamp.entity';
+import { ProductEntity } from '../../products/entities/products.entity';
 
 @Entity({ name: 'categories' })
 export class CategoryEntity extends BaseEntityWithTimestamps {
@@ -27,9 +28,17 @@ export class CategoryEntity extends BaseEntityWithTimestamps {
   @Expose()
   thumbnail: string | null;
 
-  @Column({ type: 'bigint', nullable: true })
+  @Column({ type: 'bigint', unsigned: true, nullable: true })
   @Expose({ name: 'parent_id' })
   parentId: number | null;
+
+  @Column({ type: 'boolean', nullable: false, default: true })
+  @Expose({ name: 'is_active' })
+  isActive: boolean;
+
+  @Column({ type: 'bigint', unsigned: true, nullable: false, default: 0 })
+  @Expose({ name: 'sort_order' })
+  sortOrder: number;
 
   @ManyToOne(() => CategoryEntity, (category) => category.children, {
     nullable: true,
@@ -42,14 +51,6 @@ export class CategoryEntity extends BaseEntityWithTimestamps {
   @OneToMany(() => CategoryEntity, (category) => category.parent)
   children: CategoryEntity[];
 
-  @OneToMany('ProductEntity', 'category')
-  products: any[];
-
-  @Column({ type: 'boolean', nullable: false, default: true })
-  @Expose({ name: 'is_active' })
-  isActive: boolean;
-
-  @Column({ type: 'int', nullable: false, default: 0, unique: true })
-  @Expose({ name: 'sort_order' })
-  sortOrder: number;
+  @OneToMany(() => ProductEntity, (product) => product.category)
+  products: ProductEntity[];
 }

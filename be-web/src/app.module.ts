@@ -10,7 +10,6 @@ import { SizesModule } from './modules/sizes/sizes.module';
 import { ProductVariantsModule } from './modules/product-variants/product-variants.module';
 import { ProductImagesModule } from './modules/product-images/product-images.module';
 import { CollectionsModule } from './modules/collections/collections.module';
-import { CollectionProductsModule } from './modules/collection-products/collection-products.module';
 
 @Module({
   imports: [
@@ -22,7 +21,6 @@ import { CollectionProductsModule } from './modules/collection-products/collecti
     ProductVariantsModule,
     ProductImagesModule,
     CollectionsModule,
-    CollectionProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,29 +1,31 @@
-import { IsOptional, IsInt, Min, Max } from 'class-validator';
-import { Type } from 'class-transformer';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNumber, IsOptional } from 'class-validator';
+import { IsStringOrNumber } from 'src/core/decorators/validator.decorator';
 
-export class PaginationDto {
-  @ApiPropertyOptional({ 
-    example: 1, 
-    description: 'Page number (starting from 1)',
-    minimum: 1
-  })
+export class PaginationParamsDto {
+  @IsStringOrNumber()
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
   page?: number = 1;
 
-  @ApiPropertyOptional({ 
-    example: 10, 
-    description: 'Number of items per page',
-    minimum: 1,
-    maximum: 100
-  })
+  @IsStringOrNumber()
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  @Max(100)
-  limit?: number = 10;
+  limit?: number = 100;
+
+  @IsStringOrNumber()
+  @IsOptional()
+  skip?: number;
+
+  @IsStringOrNumber()
+  @IsOptional()
+  take?: number;
+}
+
+export class PaginationResponseDto {
+  @IsNumber()
+  page: number;
+
+  @IsNumber()
+  limit: number;
+
+  @IsNumber()
+  total: number;
 }

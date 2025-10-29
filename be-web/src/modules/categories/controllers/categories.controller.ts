@@ -10,10 +10,13 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
-import { ResponseMessage } from 'src/common/decorators/response-message.decorator';
+import { ResponseMessage } from 'src/core/decorators/response-message.decorator';
 import { CategoryService } from '../services/categories.service';
-import { CreateCategoryDto } from '../dtos/create-category.dto';
-import { UpdateCategoryDto } from '../dtos/update-category.dto';
+import { 
+  CreateCategoryParamsDto,
+  UpdateCategoryParamsDto,
+  SearchCategoryDto,
+} from '../dtos/category.params.dto';
 import { CategoryEntity } from '../entities/categories.entity';
 import { plainToInstance } from 'class-transformer';
 import {
@@ -21,7 +24,7 @@ import {
   API_RESPONSE_EXAMPLES,
   PAGINATION_EXAMPLES,
 } from '../../../common/constants/api-examples';
-import { PaginationDto } from 'src/common/dtos/pagination.dto';
+import { PaginationParamsDto } from 'src/common/dtos/pagination.dto';
 
 @ApiTags('categories')
 @Controller('categories')
@@ -30,7 +33,7 @@ export class CategoryController {
 
   @Post()
   @ResponseMessage('Create category successfully')
-  @ApiBody({ type: CreateCategoryDto })
+  @ApiBody({ type: CreateCategoryParamsDto })
   @ApiOkResponse({
     description: 'Created category',
     schema: {
@@ -39,7 +42,7 @@ export class CategoryController {
       ),
     },
   })
-  async create(@Body() dto: CreateCategoryDto) {
+  async create(@Body() dto: CreateCategoryParamsDto) {
     const entity = await this.categoryService.create(dto);
     return plainToInstance(CategoryEntity, entity, {
       excludeExtraneousValues: true,
@@ -50,6 +53,9 @@ export class CategoryController {
   @ResponseMessage('Get categories successfully')
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'keyword', required: false, type: String, example: 'electronics' })
+  @ApiQuery({ name: 'isActive', required: false, type: Boolean, example: true })
+  @ApiQuery({ name: 'parentId', required: false, type: Number, example: 1 })
   @ApiOkResponse({
     description: 'Paginated list of categories',
     schema: {
@@ -59,14 +65,14 @@ export class CategoryController {
       ),
     },
   })
-  async findAll(@Query() paginationDto: PaginationDto) {
-    const result = await this.categoryService.findAllPaginated(paginationDto);
+  async findAll(@Query() searchDto: SearchCategoryDto) {
+    const result = await this.categoryService.findAllPaginated(searchDto);
 
     return {
       data: result.data.map((e) =>
         plainToInstance(CategoryEntity, e, { excludeExtraneousValues: true }),
       ),
-      paginate: result.paginate,
+      pagination: result.pagination,
     };
   }
 
@@ -94,31 +100,30 @@ export class CategoryController {
       example: API_RESPONSE_EXAMPLES.SUCCESS_RESPONSE([
         {
           id: 1,
-          name: 'Nam',
-          slug: 'nam',
-          thumbnail: 'https://example.com/nam-thumbnail.jpg',
-          parent_id: null,
-          is_active: true,
-          sort_order: 1,
+          name: 'Electronics',
+          slug: 'electronics',
+          thumbnail: 'https://example.com/electronics-thumbnail.jpg',
+          parentId: null,
+          isActive: true,
+          sortOrder: 1,
           children: [
             {
               id: 8,
-              name: 'Áo khoác nam',
-              slug: 'ao-khoac-nam',
-              thumbnail: 'https://example.com/ao-khoac-nam-thumbnail.jpg',
-              parent_id: 1,
-              is_active: true,
-              sort_order: 4,
+              name: 'Smartphones',
+              slug: 'smartphones',
+              thumbnail: 'https://example.com/smartphones-thumbnail.jpg',
+              parentId: 1,
+              isActive: true,
+              sortOrder: 4,
               children: [
                 {
                   id: 13,
-                  name: 'Áo chống nắng nam',
-                  slug: 'ao-chong-nang-nam',
-                  thumbnail:
-                    'https://example.com/ao-chong-nang-nam-thumbnail.jpg',
-                  parent_id: 8,
-                  is_active: true,
-                  sort_order: 1,
+                  name: 'iPhone',
+                  slug: 'iphone',
+                  thumbnail: 'https://example.com/iphone-thumbnail.jpg',
+                  parentId: 8,
+                  isActive: true,
+                  sortOrder: 1,
                   children: [],
                 },
               ],
@@ -151,7 +156,7 @@ export class CategoryController {
 
   @Patch(':id')
   @ResponseMessage('Update category successfully')
-  @ApiBody({ type: UpdateCategoryDto })
+  @ApiBody({ type: UpdateCategoryParamsDto })
   @ApiOkResponse({
     description: 'Updated category',
     schema: {
@@ -162,7 +167,7 @@ export class CategoryController {
   })
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateCategoryDto,
+    @Body() dto: UpdateCategoryParamsDto,
   ) {
     const entity = await this.categoryService.update(id, dto);
     return plainToInstance(CategoryEntity, entity, {
