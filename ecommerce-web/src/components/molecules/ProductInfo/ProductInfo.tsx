@@ -30,7 +30,7 @@ export default function ProductInfo({
           </div>
         )}
       </div>
-      <h1 className="text-body-md line-clamp-1 lg:line-clamp-2 lg:text-[30px] lg:font-light lg:leading-8">
+      <h1 className="text-body-md line-clamp-1 lg:line-clamp-2 lg:text-[16px] lg:font-light lg:leading-8">
         {name}
       </h1>
       <p className="text-body-sm text-theme-text-secondary my-3 flex items-center gap-1">{sku}</p>

@@ -7,10 +7,12 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
 import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { CategoryEntity } from '../../categories/entities/categories.entity';
+import { CollectionEntity } from 'src/modules/collections/entities/collections.entity';
 
 @Entity({ name: 'products' })
 export class ProductEntity {
@@ -71,4 +73,6 @@ export class ProductEntity {
 
   @OneToMany('ProductVariantEntity', 'product')
   variants: any[];
+  @ManyToMany(() => CollectionEntity, (collection) => collection.products)
+  collections: CollectionEntity[];
 }

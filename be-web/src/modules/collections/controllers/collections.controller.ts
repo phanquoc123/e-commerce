@@ -35,14 +35,28 @@ export class CollectionsController {
     description: 'Tạo bộ sưu tập thành công',
     type: CollectionEntity,
   })
-  create(@Body() createCollectionDto: CreateCollectionDto): Promise<CollectionEntity> {
+  create(
+    @Body() createCollectionDto: CreateCollectionDto,
+  ): Promise<CollectionEntity> {
     return this.collectionsService.create(createCollectionDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Lấy danh sách tất cả bộ sưu tập' })
-  @ApiQuery({ name: 'includeProducts', required: false, description: 'Bao gồm danh sách sản phẩm', type: 'boolean', example: true })
-  @ApiQuery({ name: 'productLimit', required: false, description: 'Giới hạn số sản phẩm mỗi collection', type: 'number', example: 10 })
+  @ApiQuery({
+    name: 'includeProducts',
+    required: false,
+    description: 'Bao gồm danh sách sản phẩm',
+    type: 'boolean',
+    example: true,
+  })
+  @ApiQuery({
+    name: 'productLimit',
+    required: false,
+    description: 'Giới hạn số sản phẩm mỗi collection',
+    type: 'number',
+    example: 10,
+  })
   @ApiResponse({
     status: 200,
     description: 'Lấy danh sách bộ sưu tập thành công',
@@ -57,18 +71,29 @@ export class CollectionsController {
 
   @Get('with-products')
   @ApiOperation({ summary: 'Lấy tất cả bộ sưu tập kèm danh sách sản phẩm' })
-  @ApiQuery({ name: 'productLimit', required: false, description: 'Giới hạn số sản phẩm mỗi collection', type: 'number', example: 8 })
+  @ApiQuery({
+    name: 'productLimit',
+    required: false,
+    description: 'Giới hạn số sản phẩm mỗi collection',
+    type: 'number',
+    example: 8,
+  })
   @ApiResponse({
     status: 200,
     description: 'Lấy danh sách bộ sưu tập với sản phẩm thành công',
   })
-  findAllWithProducts(@Query('productLimit') productLimit?: number) {
-    return this.collectionsService.findAllWithProducts(productLimit);
+  findAllWithProducts() {
+    return this.collectionsService.findAllWithProducts();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Lấy thông tin bộ sưu tập theo ID' })
-  @ApiParam({ name: 'id', description: 'ID của bộ sưu tập', type: 'number', example: 1 })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của bộ sưu tập',
+    type: 'number',
+    example: 1,
+  })
   @ApiResponse({
     status: 200,
     description: 'Lấy thông tin bộ sưu tập thành công',
@@ -84,10 +109,33 @@ export class CollectionsController {
 
   @Get(':id/products')
   @ApiOperation({ summary: 'Lấy danh sách sản phẩm theo bộ sưu tập' })
-  @ApiParam({ name: 'id', description: 'ID của bộ sưu tập', type: 'number', example: 1 })
-  @ApiQuery({ name: 'page', required: false, description: 'Số trang', type: 'number', example: 1 })
-  @ApiQuery({ name: 'limit', required: false, description: 'Số lượng sản phẩm mỗi trang', type: 'number', example: 12 })
-  @ApiQuery({ name: 'search', required: false, description: 'Tìm kiếm theo tên sản phẩm', type: 'string', example: 'áo thun' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của bộ sưu tập',
+    type: 'number',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Số trang',
+    type: 'number',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Số lượng sản phẩm mỗi trang',
+    type: 'number',
+    example: 12,
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Tìm kiếm theo tên sản phẩm',
+    type: 'string',
+    example: 'áo thun',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lấy danh sách sản phẩm thành công',
@@ -111,7 +159,12 @@ export class CollectionsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Cập nhật thông tin bộ sưu tập' })
-  @ApiParam({ name: 'id', description: 'ID của bộ sưu tập', type: 'number', example: 1 })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của bộ sưu tập',
+    type: 'number',
+    example: 1,
+  })
   @ApiBody({ type: UpdateCollectionDto })
   @ApiResponse({
     status: 200,
@@ -131,7 +184,12 @@ export class CollectionsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Xóa bộ sưu tập' })
-  @ApiParam({ name: 'id', description: 'ID của bộ sưu tập', type: 'number', example: 1 })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của bộ sưu tập',
+    type: 'number',
+    example: 1,
+  })
   @ApiResponse({
     status: 200,
     description: 'Xóa bộ sưu tập thành công',

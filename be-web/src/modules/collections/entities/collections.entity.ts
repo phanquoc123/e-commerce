@@ -5,9 +5,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { ProductEntity } from 'src/modules/products/entities/products.entity';
 
 @Entity({ name: 'collections' })
 export class CollectionEntity {
@@ -51,7 +54,11 @@ export class CollectionEntity {
   @ApiProperty()
   updatedAt: Date;
 
-  // Relations
-  @OneToMany('CollectionProductEntity', 'collection')
-  collectionProducts: any[];
+  @ManyToMany(() => ProductEntity, (product) => product.collections)
+  @JoinTable({
+    name: 'collection_products', // bảng trung gian
+    joinColumn: { name: 'collection_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'product_id', referencedColumnName: 'id' },
+  })
+  products: ProductEntity;
 }

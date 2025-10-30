@@ -7,7 +7,6 @@ import { CollectionEntity } from '../modules/collections/entities/collections.en
 import { ProductColorEntity } from '../modules/product-colors/entities/product-colors.entity';
 import { ProductVariantEntity } from '../modules/product-variants/entities/product-variants.entity';
 import { ProductImageEntity } from '../modules/product-images/entities/product-images.entity';
-import { CollectionProductEntity } from '../modules/collection-products/entities/collection-products.entity';
 
 async function seedAll() {
   const dataSource = MysqlDataSource;
@@ -20,9 +19,9 @@ async function seedAll() {
     // ============ CLEAR EXISTING DATA ============
     console.log('🗑️  Clearing existing data...');
     const categoryRepository = dataSource.getRepository(CategoryEntity);
-    
+
     await categoryRepository.query('SET FOREIGN_KEY_CHECKS = 0');
-    await categoryRepository.query('TRUNCATE TABLE `collection_products`');
+    // Removed: collection_products table no longer used
     await categoryRepository.query('TRUNCATE TABLE `product_images`');
     await categoryRepository.query('TRUNCATE TABLE `product_variants`');
     await categoryRepository.query('TRUNCATE TABLE `product_colors`');
@@ -42,16 +41,18 @@ async function seedAll() {
     const productRepository = dataSource.getRepository(ProductEntity);
     const collectionRepository = dataSource.getRepository(CollectionEntity);
     const productColorRepository = dataSource.getRepository(ProductColorEntity);
-    const productVariantRepository = dataSource.getRepository(ProductVariantEntity);
+    const productVariantRepository =
+      dataSource.getRepository(ProductVariantEntity);
     const productImageRepository = dataSource.getRepository(ProductImageEntity);
-    const collectionProductRepository = dataSource.getRepository(CollectionProductEntity);
+    // Removed: collection_products repository no longer used
 
     const categoriesToSeed = [
       // Root Categories
       {
         name: 'Nam',
         slug: 'nam',
-        thumbnail: 'https://images.unsplash.com/photo-1490114538077-0a7f8cb49891',
+        thumbnail:
+          'https://images.unsplash.com/photo-1490114538077-0a7f8cb49891',
         parentId: null,
         isActive: true,
         sortOrder: 1,
@@ -59,7 +60,8 @@ async function seedAll() {
       {
         name: 'Nữ',
         slug: 'nu',
-        thumbnail: 'https://images.unsplash.com/photo-1483985988355-763728e1935b',
+        thumbnail:
+          'https://images.unsplash.com/photo-1483985988355-763728e1935b',
         parentId: null,
         isActive: true,
         sortOrder: 2,
@@ -67,7 +69,8 @@ async function seedAll() {
       {
         name: 'Trẻ em',
         slug: 'tre-em',
-        thumbnail: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4',
+        thumbnail:
+          'https://images.unsplash.com/photo-1503919545889-aef636e10ad4',
         parentId: null,
         isActive: true,
         sortOrder: 3,
@@ -75,7 +78,8 @@ async function seedAll() {
       {
         name: 'Phụ kiện',
         slug: 'phu-kien',
-        thumbnail: 'https://images.unsplash.com/photo-1523398002811-999ca8dec234',
+        thumbnail:
+          'https://images.unsplash.com/photo-1523398002811-999ca8dec234',
         parentId: null,
         isActive: true,
         sortOrder: 4,
@@ -95,7 +99,8 @@ async function seedAll() {
       {
         name: 'Áo nam',
         slug: 'ao-nam',
-        thumbnail: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf',
+        thumbnail:
+          'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf',
         parentId: namId,
         isActive: true,
         sortOrder: 1,
@@ -103,7 +108,8 @@ async function seedAll() {
       {
         name: 'Quần nam',
         slug: 'quan-nam',
-        thumbnail: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a',
+        thumbnail:
+          'https://images.unsplash.com/photo-1473966968600-fa801b869a1a',
         parentId: namId,
         isActive: true,
         sortOrder: 2,
@@ -137,7 +143,8 @@ async function seedAll() {
       {
         name: 'Áo nữ',
         slug: 'ao-nu',
-        thumbnail: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e',
+        thumbnail:
+          'https://images.unsplash.com/photo-1485968579580-b6d095142e6e',
         parentId: nuId,
         isActive: true,
         sortOrder: 1,
@@ -145,7 +152,8 @@ async function seedAll() {
       {
         name: 'Quần nữ',
         slug: 'quan-nu',
-        thumbnail: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8',
+        thumbnail:
+          'https://images.unsplash.com/photo-1506629082955-511b1aa562c8',
         parentId: nuId,
         isActive: true,
         sortOrder: 2,
@@ -153,7 +161,8 @@ async function seedAll() {
       {
         name: 'Váy nữ',
         slug: 'vay-nu',
-        thumbnail: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8',
+        thumbnail:
+          'https://images.unsplash.com/photo-1595777457583-95e059d581b8',
         parentId: nuId,
         isActive: true,
         sortOrder: 3,
@@ -161,7 +170,8 @@ async function seedAll() {
       {
         name: 'Đầm nữ',
         slug: 'dam-nu',
-        thumbnail: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae',
+        thumbnail:
+          'https://images.unsplash.com/photo-1566174053879-31528523f8ae',
         parentId: nuId,
         isActive: true,
         sortOrder: 4,
@@ -179,7 +189,8 @@ async function seedAll() {
       {
         name: 'Áo thun nam',
         slug: 'ao-thun-nam',
-        thumbnail: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab',
+        thumbnail:
+          'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab',
         parentId: aoNamId,
         isActive: true,
         sortOrder: 1,
@@ -187,7 +198,8 @@ async function seedAll() {
       {
         name: 'Áo sơ mi nam',
         slug: 'ao-so-mi-nam',
-        thumbnail: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c',
+        thumbnail:
+          'https://images.unsplash.com/photo-1596755094514-f87e34085b2c',
         parentId: aoNamId,
         isActive: true,
         sortOrder: 2,
@@ -195,7 +207,8 @@ async function seedAll() {
       {
         name: 'Áo polo nam',
         slug: 'ao-polo-nam',
-        thumbnail: 'https://images.unsplash.com/photo-1626497764746-6dc36546b388',
+        thumbnail:
+          'https://images.unsplash.com/photo-1626497764746-6dc36546b388',
         parentId: aoNamId,
         isActive: true,
         sortOrder: 3,
@@ -342,7 +355,8 @@ async function seedAll() {
         categoryId: aoThunNam?.id || 1,
         name: 'Áo thun nam basic cotton Premium',
         slug: 'ao-thun-nam-basic-cotton-premium',
-        description: 'Áo thun nam chất liệu cotton 100% cao cấp, form regular fit thoải mái, thấm hút mồ hôi tốt.',
+        description:
+          'Áo thun nam chất liệu cotton 100% cao cấp, form regular fit thoải mái, thấm hút mồ hôi tốt.',
         price: 199000,
         salePrice: 149000,
         isActive: true,
@@ -351,7 +365,8 @@ async function seedAll() {
         categoryId: aoThunNam?.id || 1,
         name: 'Áo thun nam Polo trơn',
         slug: 'ao-thun-nam-polo-tron',
-        description: 'Áo polo nam sang trọng, cổ bẻ phối viền, thích hợp đi làm và dạo phố.',
+        description:
+          'Áo polo nam sang trọng, cổ bẻ phối viền, thích hợp đi làm và dạo phố.',
         price: 299000,
         salePrice: 249000,
         isActive: true,
@@ -360,7 +375,8 @@ async function seedAll() {
         categoryId: aoThunNam?.id || 1,
         name: 'Áo thun nam oversize form rộng',
         slug: 'ao-thun-nam-oversize-form-rong',
-        description: 'Áo thun nam form oversize trendy, phù hợp phong cách streetwear.',
+        description:
+          'Áo thun nam form oversize trendy, phù hợp phong cách streetwear.',
         price: 249000,
         salePrice: null,
         isActive: true,
@@ -369,7 +385,8 @@ async function seedAll() {
         categoryId: aoThunNam?.id || 1,
         name: 'Áo thun nam cổ tròn Premium Basics',
         slug: 'ao-thun-nam-co-tron-premium-basics',
-        description: 'Áo thun basic thiết kế tối giản, chất vải mềm mại, co giãn nhẹ.',
+        description:
+          'Áo thun basic thiết kế tối giản, chất vải mềm mại, co giãn nhẹ.',
         price: 179000,
         salePrice: 139000,
         isActive: true,
@@ -379,7 +396,8 @@ async function seedAll() {
         categoryId: aoSoMiNam?.id || 1,
         name: 'Áo sơ mi nam dài tay công sở',
         slug: 'ao-so-mi-nam-dai-tay-cong-so',
-        description: 'Áo sơ mi nam dài tay chất vải cao cấp, chống nhăn, phù hợp môi trường công sở.',
+        description:
+          'Áo sơ mi nam dài tay chất vải cao cấp, chống nhăn, phù hợp môi trường công sở.',
         price: 399000,
         salePrice: 349000,
         isActive: true,
@@ -398,7 +416,8 @@ async function seedAll() {
         categoryId: quanNam?.id || 1,
         name: 'Quần jean nam slim fit xanh đậm',
         slug: 'quan-jean-nam-slim-fit-xanh-dam',
-        description: 'Quần jean nam form slim fit ôm vừa vặn, chất vải denim co giãn nhẹ.',
+        description:
+          'Quần jean nam form slim fit ôm vừa vặn, chất vải denim co giãn nhẹ.',
         price: 499000,
         salePrice: 399000,
         isActive: true,
@@ -407,7 +426,8 @@ async function seedAll() {
         categoryId: quanNam?.id || 1,
         name: 'Quần kaki nam công sở Regular Fit',
         slug: 'quan-kaki-nam-cong-so-regular-fit',
-        description: 'Quần kaki nam chất vải cao cấp, form regular thoải mái, phù hợp đi làm.',
+        description:
+          'Quần kaki nam chất vải cao cấp, form regular thoải mái, phù hợp đi làm.',
         price: 379000,
         salePrice: 329000,
         isActive: true,
@@ -416,7 +436,8 @@ async function seedAll() {
         categoryId: quanNam?.id || 1,
         name: 'Quần jogger nam thể thao',
         slug: 'quan-jogger-nam-the-thao',
-        description: 'Quần jogger nam form thể thao, chất vải thun co giãn tốt, thoải mái vận động.',
+        description:
+          'Quần jogger nam form thể thao, chất vải thun co giãn tốt, thoải mái vận động.',
         price: 299000,
         salePrice: null,
         isActive: true,
@@ -435,7 +456,8 @@ async function seedAll() {
         categoryId: aoNu?.id || 2,
         name: 'Áo kiểu nữ tay bồng vintage',
         slug: 'ao-kieu-nu-tay-bong-vintage',
-        description: 'Áo kiểu nữ thiết kế tay bồng điệu đà, phong cách vintage.',
+        description:
+          'Áo kiểu nữ thiết kế tay bồng điệu đà, phong cách vintage.',
         price: 259000,
         salePrice: 219000,
         isActive: true,
@@ -454,7 +476,8 @@ async function seedAll() {
         categoryId: damNu?.id || 2,
         name: 'Váy đầm nữ babydoll dễ thương',
         slug: 'vay-dam-nu-babydoll-de-thuong',
-        description: 'Váy đầm babydoll xinh xắn, thiết kế xòe nhẹ, phù hợp dạo phố.',
+        description:
+          'Váy đầm babydoll xinh xắn, thiết kế xòe nhẹ, phù hợp dạo phố.',
         price: 349000,
         salePrice: 299000,
         isActive: true,
@@ -472,7 +495,8 @@ async function seedAll() {
         categoryId: damNu?.id || 2,
         name: 'Đầm suông nữ công sở',
         slug: 'dam-suong-nu-cong-so',
-        description: 'Đầm suông nữ form A đơn giản, phù hợp môi trường công sở.',
+        description:
+          'Đầm suông nữ form A đơn giản, phù hợp môi trường công sở.',
         price: 429000,
         salePrice: null,
         isActive: true,
@@ -495,7 +519,7 @@ async function seedAll() {
     // Mỗi sản phẩm có 2-4 màu
     for (const product of savedProducts) {
       const productIndex = savedProducts.indexOf(product);
-      
+
       if (productIndex % 3 === 0) {
         // Sản phẩm 0, 3, 6, 9, 12: Đen, Trắng, Xám, Navy
         productColorsToSeed.push(
@@ -577,18 +601,21 @@ async function seedAll() {
 
     // Tạo variants cho mỗi product color với các size khác nhau
     for (const productColor of savedProductColors) {
-      const product = savedProducts.find((p) => p.id === productColor.productId);
+      const product = savedProducts.find(
+        (p) => p.id === productColor.productId,
+      );
       if (!product) continue;
 
       // Mỗi màu có 3-4 size
       const sizeCodes = ['s', 'm', 'l', 'xl'];
-      
+
       for (const sizeCode of sizeCodes) {
         const sizeId = savedSizes[sizeCode];
         if (!sizeId) continue;
 
-        const sku = `${product.slug}-${Object.keys(savedColors).find(k => savedColors[k] === productColor.colorId)}-${sizeCode}`.toUpperCase();
-        
+        const sku =
+          `${product.slug}-${Object.keys(savedColors).find((k) => savedColors[k] === productColor.colorId)}-${sizeCode}`.toUpperCase();
+
         variantsToSeed.push({
           productId: product.id,
           colorId: productColor.id,
@@ -614,36 +641,42 @@ async function seedAll() {
       {
         name: 'Bộ sưu tập mùa hè 2024',
         slug: 'bo-suu-tap-mua-he-2024',
-        description: 'Bộ sưu tập thời trang mùa hè sôi động, tươi mới với những gam màu tươi sáng.',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b',
+        description:
+          'Bộ sưu tập thời trang mùa hè sôi động, tươi mới với những gam màu tươi sáng.',
+        thumbnailUrl:
+          'https://images.unsplash.com/photo-1523381210434-271e8be1f52b',
         isActive: true,
       },
       {
         name: 'Bộ sưu tập xuân 2024',
         slug: 'bo-suu-tap-xuan-2024',
         description: 'Bộ sưu tập xuân ngọt ngào với những họa tiết hoa lá.',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1445205170230-053b83016050',
+        thumbnailUrl:
+          'https://images.unsplash.com/photo-1445205170230-053b83016050',
         isActive: true,
       },
       {
         name: 'Bộ sưu tập công sở',
         slug: 'bo-suu-tap-cong-so',
         description: 'Bộ sưu tập thời trang công sở lịch sự, chuyên nghiệp.',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
+        thumbnailUrl:
+          'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
         isActive: true,
       },
       {
         name: 'Bộ sưu tập Streetwear',
         slug: 'bo-suu-tap-streetwear',
         description: 'Bộ sưu tập phong cách đường phố năng động, cá tính.',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f',
+        thumbnailUrl:
+          'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f',
         isActive: true,
       },
       {
         name: 'Bộ sưu tập Premium',
         slug: 'bo-suu-tap-premium',
         description: 'Bộ sưu tập cao cấp với chất liệu và thiết kế đẳng cấp.',
-        thumbnailUrl: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04',
+        thumbnailUrl:
+          'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04',
         isActive: true,
       },
     ];
@@ -656,70 +689,7 @@ async function seedAll() {
     }
     console.log('✅ Collections seeded successfully!\n');
 
-    // ============ SEED COLLECTION PRODUCTS ============
-    console.log('🔗 Seeding Collection Products...');
-
-    const collectionProductsToSeed: any[] = [];
-
-    // Phân phối sản phẩm vào collections
-    if (savedCollections.length > 0 && savedProducts.length > 0) {
-      // Summer collection - sản phẩm 0-4
-      for (let i = 0; i < Math.min(5, savedProducts.length); i++) {
-        collectionProductsToSeed.push({
-          collectionId: savedCollections[0].id,
-          productId: savedProducts[i].id,
-          sortOrder: i + 1,
-        });
-      }
-
-      // Spring collection - sản phẩm 3-7
-      for (let i = 3; i < Math.min(8, savedProducts.length); i++) {
-        collectionProductsToSeed.push({
-          collectionId: savedCollections[1].id,
-          productId: savedProducts[i].id,
-          sortOrder: i - 2,
-        });
-      }
-
-      // Office collection - sản phẩm có sơ mi, kaki
-      [4, 5, 7, 14].forEach((idx, order) => {
-        if (idx < savedProducts.length) {
-          collectionProductsToSeed.push({
-            collectionId: savedCollections[2].id,
-            productId: savedProducts[idx].id,
-            sortOrder: order + 1,
-          });
-        }
-      });
-
-      // Streetwear collection - sản phẩm oversize, jogger
-      [2, 8, 11].forEach((idx, order) => {
-        if (idx < savedProducts.length) {
-          collectionProductsToSeed.push({
-            collectionId: savedCollections[3].id,
-            productId: savedProducts[idx].id,
-            sortOrder: order + 1,
-          });
-        }
-      });
-
-      // Premium collection - sản phẩm cao cấp
-      [5, 6, 13, 14].forEach((idx, order) => {
-        if (idx < savedProducts.length) {
-          collectionProductsToSeed.push({
-            collectionId: savedCollections[4].id,
-            productId: savedProducts[idx].id,
-            sortOrder: order + 1,
-          });
-        }
-      });
-    }
-
-    for (const cpData of collectionProductsToSeed) {
-      const collectionProduct = collectionProductRepository.create(cpData);
-      await collectionProductRepository.save(collectionProduct);
-    }
-    console.log('✅ Collection Products seeded successfully!\n');
+    // Removed: seeding collection_products
 
     // ============ SUMMARY ============
     const totalCategories = await categoryRepository.count();
@@ -730,7 +700,6 @@ async function seedAll() {
     const totalVariants = await productVariantRepository.count();
     const totalImages = await productImageRepository.count();
     const totalCollections = await collectionRepository.count();
-    const totalCollectionProducts = await collectionProductRepository.count();
 
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('📊 SEED SUMMARY:');
@@ -743,10 +712,11 @@ async function seedAll() {
     console.log(`🔀 Product Variants: ${totalVariants}`);
     console.log(`🖼️  Product Images: ${totalImages}`);
     console.log(`📦 Collections: ${totalCollections}`);
-    console.log(`🔗 Collection Products: ${totalCollectionProducts}`);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-    
-    console.log('💡 Note: Carts and Orders will be created when users interact with the app.\n');
+
+    console.log(
+      '💡 Note: Carts and Orders will be created when users interact with the app.\n',
+    );
   } catch (error) {
     console.error('❌ Error seeding database:', error);
     throw error;
