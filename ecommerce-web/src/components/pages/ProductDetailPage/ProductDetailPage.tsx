@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import BlackLine from '../../atoms/BlackLine/BlackLine';
 import Breadcrums from '../../molecules/Breadcrums/Breadcrums';
 import ProductInfo from '../../molecules/ProductInfo/ProductInfo';
@@ -7,49 +8,108 @@ import ProductActions from '../../molecules/ProductActions/ProductActions';
 import StoreCommitment from '../../molecules/StoreCommitment/StoreCommitment';
 import ProductImageGallery from '../../molecules/ProductImageGallery/ProductImageGallery';
 import { MainLayout } from '../../templates';
-
-// Mock data
-const productData = {
-  name: 'Áo Gió Nam Chống Nắng 4c Plus Dáng Suông',
-  price: 539100,
-  originalPrice: 599000,
-  discount: 10,
-  sku: 'MCPO25S109-SW001-S',
-  image: './images/product/product-detail.webp',
-  bottomImage: './images/product/image-bottom.webp',
-  galleryImages: [
-    './images/product/product-detail.webp',
-    './images/product/product-detail-1.webp',
-    './images/product/product-detail-2.webp',
-    './images/product/product-detail-3.webp',
-    './images/product/product-detail-4.webp',
-  ],
-};
-
-const colorOptions = [
-  { name: 'ĐEN 002', value: 'black' },
-  { name: 'ĐỎ', value: 'red' },
-  { name: 'XANH', value: 'green' },
-];
-
-const sizeOptions = [
-  { name: 'S', value: 'S' },
-  { name: 'M', value: 'M' },
-  { name: 'L', value: 'L' },
-  { name: 'XL', value: 'XL' },
-];
+import { useProductDetail } from '../../../hooks/useProduct';
 
 export default function ProductDetailPage() {
-  const [selectedColor, setSelectedColor] = useState('black');
-  const [selectedSize, setSelectedSize] = useState('S');
+  const { slug } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { data: product } = useProductDetail(slug || '');
+  console.log('product', product);
+
+  const urlColorId = useMemo(
+    () => Number(searchParams.get('color') || searchParams.get('colorId') || 0) || null,
+    [searchParams]
+  );
+  const urlSizeId = useMemo(
+    () => Number(searchParams.get('size') || searchParams.get('sizeId') || 0) || null,
+    [searchParams]
+  );
+
+  const [selectedColorHex, setSelectedColorHex] = useState<string | undefined>(undefined);
+  const [selectedSizeCode, setSelectedSizeCode] = useState<string | undefined>(undefined);
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(productData.image);
+  const [selectedImage, setSelectedImage] = useState<string>('');
+
+  
+
+  // Helpers: mapping
+  const colorByHex = useMemo(() => {
+    const map = new Map<string, any>();
+    product?.colors?.forEach(c => {
+      if (c.hexCode) map.set(c.hexCode, c);
+    });
+    return map;
+  }, [product]);
+
+  const colorById = useMemo(() => {
+    const map = new Map<number, any>();
+    product?.colors?.forEach(c => map.set(c.id, c));
+    return map;
+  }, [product]);
+
+  // Initialize selection from URL or defaults
+  useEffect(() => {
+    if (!product) return;
+
+    if (urlColorId && colorById.get(urlColorId)) {
+      const c = colorById.get(urlColorId);
+      setSelectedColorHex(c.hexCode || undefined);
+      if (urlSizeId) {
+        const size = c.sizes.find((s: any) => s.id === urlSizeId);
+        if (size) setSelectedSizeCode(size.code);
+      }
+      const main = c.images.find((i: any) => i.isMain) || c.images[0];
+      if (main) setSelectedImage(main.imageUrl);
+      return;
+    }
+
+    const firstColor = product.colors?.[0];
+    if (firstColor) {
+      setSelectedColorHex(firstColor.hexCode || undefined);
+      const main = firstColor.images.find((i: any) => i.isMain) || firstColor.images[0];
+      if (main) setSelectedImage(main.imageUrl);
+      const firstSize = firstColor.sizes?.[0];
+      if (firstSize) setSelectedSizeCode(firstSize.code);
+    }
+  }, [product, urlColorId, urlSizeId, colorById]);
+
+  // Build options for UI
+  const colorOptions = useMemo(() => {
+    return (product?.colors || []).map(c => ({
+      name: c.name,
+      value: c.hexCode || '#ccc',
+      selected: selectedColorHex === c.hexCode,
+    }));
+  }, [product, selectedColorHex]);
+
+  const sizesForSelectedColor = useMemo(() => {
+    const color = selectedColorHex ? colorByHex.get(selectedColorHex) : null;
+    return (color?.sizes || []).map((s: any) => ({
+      name: s.name,
+      value: s.code,
+      selected: selectedSizeCode === s.code,
+    }));
+  }, [colorByHex, selectedColorHex, selectedSizeCode]);
+
+  // Determine active variant by current color+size selection
+  const activeVariant = useMemo(() => {
+    if (!product) return null;
+    const color = selectedColorHex ? colorByHex.get(selectedColorHex) : null;
+    if (!color) return null;
+    return (
+      product.variants?.find(
+        (v: any) =>
+          (v.colorId === color.id || v.productColorId === color.productColorId) &&
+          (selectedSizeCode ? v.size?.code === selectedSizeCode : true)
+      ) || null
+    );
+  }, [product, colorByHex, selectedColorHex, selectedSizeCode]);
 
   const handleAddToCart = () => {
     console.log('Thêm vào giỏ hàng:', {
-      product: productData.name,
-      color: selectedColor,
-      size: selectedSize,
+      product: product?.name,
+      colorHex: selectedColorHex,
+      sizeCode: selectedSizeCode,
       quantity,
     });
   };
@@ -63,7 +123,13 @@ export default function ProductDetailPage() {
           <div className="flex w-[648px] flex-col gap-8">
             <div className="flex gap-3">
               <ProductImageGallery
-                images={productData.galleryImages}
+                images={(() => {
+                  if (selectedColorHex) {
+                    const c = colorByHex.get(selectedColorHex);
+                    return (c?.images || []).map((i: any) => i.imageUrl);
+                  }
+                  return [] as string[];
+                })()}
                 selectedImage={selectedImage}
                 onImageSelect={setSelectedImage}
                 className="hidden lg:block"
@@ -92,28 +158,34 @@ export default function ProductDetailPage() {
           {/* Product Details */}
           <div className="border-border-primary flex flex-col gap-4 border-b-2 bg-[#fff] px-3 pb-6 pt-4 lg:gap-8 lg:border-none lg:px-0 lg:pb-4 lg:pt-0">
             <ProductInfo
-              name={productData.name}
-              price={productData.price}
-              originalPrice={productData.originalPrice}
-              discount={productData.discount}
-              sku={productData.sku}
+              name={product?.name || ''}
+              price={product?.price || 0}
+              salePrice={product?.salePrice}
             />
+            <div className="text-body-sm text-theme-text-secondary">
+              {activeVariant?.sku ? `${activeVariant.sku}` : ''}
+            </div>
 
             <BlackLine />
 
             <ProductOptions
-              colors={colorOptions.map(color => ({
-                ...color,
-                selected: selectedColor === color.value,
-              }))}
-              sizes={sizeOptions.map(size => ({
-                ...size,
-                selected: selectedSize === size.value,
-              }))}
-              selectedColor={selectedColor}
-              selectedSize={selectedSize}
-              onColorSelect={setSelectedColor}
-              onSizeSelect={setSelectedSize}
+              colors={colorOptions}
+              sizes={sizesForSelectedColor}
+              selectedColor={selectedColorHex}
+              selectedSize={selectedSizeCode}
+              onColorSelect={hex => {
+                setSelectedColorHex(hex);
+                const c = colorByHex.get(hex);
+                const main = c?.images?.find((i: any) => i.isMain) || c?.images?.[0];
+                if (main) setSelectedImage(main.imageUrl);
+                const firstSize = c?.sizes?.[0];
+                if (firstSize) setSelectedSizeCode(firstSize.code);
+               
+              }}
+              onSizeSelect={code => {
+                setSelectedSizeCode(code);
+              
+              }}
             />
 
             <BlackLine />

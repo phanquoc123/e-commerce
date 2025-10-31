@@ -79,24 +79,117 @@ export class CollectionsService {
           .limit(productLimit)
           .getMany();
 
-        const mappedProducts = products.map((p: any, idx: number) => ({
-          id: p.id,
-          name: p.name,
-          slug: p.slug,
-          description: p.description,
-          price: p.price,
-          isActive: p.isActive,
-          category: p.category
-            ? {
-                id: p.category.id,
-                name: p.category.name,
-                slug: p.category.slug,
+        // Lấy màu sắc và hình ảnh cho từng sản phẩm
+        const mappedProducts = await Promise.all(
+          products.map(async (p: any, idx: number) => {
+            // Lấy danh sách màu của sản phẩm kèm theo hình ảnh
+            const productColors = await this.productRepository.manager.query(
+              `
+              SELECT 
+                pc.id as productColorId,
+                c.id as colorId,
+                c.name as colorName,
+                c.code as colorCode,
+                c.hexCode as colorHexCode,
+                c.thumbnailUrl as colorThumbnailUrl,
+                pi.id as imageId,
+                pi.imageUrl,
+                pi.isMain,
+                pi.sortOrder
+              FROM product_colors pc
+              INNER JOIN colors c ON pc.colorId = c.id
+              LEFT JOIN product_images pi ON pi.productColorId = pc.id
+              WHERE pc.productId = ?
+              ORDER BY c.id, pi.sortOrder ASC, pi.isMain DESC
+              `,
+              [p.id],
+            );
+
+            // Lấy danh sách sizes có sẵn cho từng màu (từ product_variants)
+            const productVariants = await this.productRepository.manager.query(
+              `
+              SELECT 
+                pc.colorId,
+                ps.id as sizeId,
+                ps.name as sizeName,
+                ps.code as sizeCode,
+                pv.stock,
+                pv.status
+              FROM product_variants pv
+              INNER JOIN product_colors pc ON pv.colorId = pc.id
+              INNER JOIN product_sizes ps ON pv.sizeId = ps.id
+              WHERE pv.productId = ? AND pv.status = 'active'
+              ORDER BY pc.colorId, ps.id
+              `,
+              [p.id],
+            );
+
+            // Nhóm sizes theo màu
+            const colorSizesMap = new Map();
+            productVariants.forEach((variant) => {
+              if (!colorSizesMap.has(variant.colorId)) {
+                colorSizesMap.set(variant.colorId, []);
               }
-            : null,
-          displayOrder: idx + 1,
-          createdAt: p.createdAt,
-          updatedAt: p.updatedAt,
-        }));
+              colorSizesMap.get(variant.colorId).push({
+                id: variant.sizeId,
+                name: variant.sizeName,
+                code: variant.sizeCode,
+                stock: variant.stock,
+                status: variant.status,
+              });
+            });
+
+            // Nhóm hình ảnh theo màu
+            const colorsMap = new Map();
+            productColors.forEach((row) => {
+              if (!colorsMap.has(row.colorId)) {
+                colorsMap.set(row.colorId, {
+                  id: row.colorId,
+                  name: row.colorName,
+                  code: row.colorCode,
+                  hexCode: row.colorHexCode,
+                  thumbnailUrl: row.colorThumbnailUrl,
+                  productColorId: row.productColorId,
+                  images: [],
+                  sizes: colorSizesMap.get(row.colorId) || [],
+                });
+              }
+
+              // Thêm hình ảnh nếu có
+              if (row.imageId) {
+                colorsMap.get(row.colorId).images.push({
+                  id: row.imageId,
+                  imageUrl: row.imageUrl,
+                  isMain: Boolean(row.isMain),
+                  sortOrder: row.sortOrder,
+                });
+              }
+            });
+
+            const colors = Array.from(colorsMap.values());
+
+            return {
+              id: p.id,
+              name: p.name,
+              slug: p.slug,
+              description: p.description,
+              price: p.price,
+              salePrice: p.salePrice,
+              isActive: p.isActive,
+              category: p.category
+                ? {
+                    id: p.category.id,
+                    name: p.category.name,
+                    slug: p.category.slug,
+                  }
+                : null,
+              colors: colors, // Danh sách màu sắc, hình ảnh và sizes
+              displayOrder: idx + 1,
+              createdAt: p.createdAt,
+              updatedAt: p.updatedAt,
+            };
+          }),
+        );
 
         return {
           id: collection.id,

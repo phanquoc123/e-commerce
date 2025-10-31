@@ -4,9 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { ProductVariantEntity } from 'src/modules/product-variants/entities/product-variants.entity';
 
 @Entity({ name: 'product_sizes' })
 export class ProductSizeEntity {
@@ -34,5 +36,6 @@ export class ProductSizeEntity {
   @Expose({ name: 'updated_at' })
   @ApiProperty()
   updatedAt: Date;
+  @OneToMany(() => ProductVariantEntity, (variant) => variant.sizeId)
+  variants: ProductVariantEntity[];
 }
-

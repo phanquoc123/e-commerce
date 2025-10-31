@@ -59,6 +59,77 @@ export class ProductVariantsController {
     return this.productVariantsService.findAll();
   }
 
+  @Get('product/:slug')
+  @ApiOperation({ summary: 'Lấy chi tiết sản phẩm đầy đủ (bao gồm màu, ảnh, sizes, variants)' })
+  @ApiParam({ name: 'slug', description: 'Slug của sản phẩm', type: 'string' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lấy chi tiết sản phẩm thành công',
+    schema: {
+      example: {
+        id: 1,
+        name: 'Áo thun nam basic cotton Premium',
+        slug: 'ao-thun-nam-basic-cotton-premium',
+        description: 'Áo thun nam chất liệu cotton 100% cao cấp',
+        price: 199000,
+        salePrice: 149000,
+        discountPercent: 25,
+        isActive: true,
+        category: {
+          id: 1,
+          name: 'Áo thun nam',
+          slug: 'ao-thun-nam',
+        },
+        colors: [
+          {
+            id: 1,
+            name: 'Đen',
+            code: 'black',
+            hexCode: '#000000',
+            thumbnailUrl: 'https://...',
+            productColorId: 1,
+            images: [
+              {
+                id: 1,
+                imageUrl: 'https://...',
+                isMain: true,
+                sortOrder: 1,
+              },
+            ],
+            sizes: [
+              {
+                id: 1,
+                name: 'M',
+                code: 'm',
+              },
+            ],
+            variants: [
+              {
+                id: 1,
+                sku: 'ATN-BLACK-M',
+                price: 199000,
+                stock: 50,
+                status: 'active',
+                sizeId: 1,
+                sizeName: 'M',
+                sizeCode: 'm',
+              },
+            ],
+          },
+        ],
+        createdAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: '2024-01-01T00:00:00.000Z',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Không tìm thấy sản phẩm',
+  })
+  getProductDetail(@Param('slug') slug: string) {
+    return this.productVariantsService.getProductDetail(slug);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Lấy thông tin biến thể sản phẩm theo ID' })
   @ApiParam({ name: 'id', description: 'ID của biến thể sản phẩm', type: 'number' })

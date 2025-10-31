@@ -13,6 +13,8 @@ import { Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { CategoryEntity } from '../../categories/entities/categories.entity';
 import { CollectionEntity } from 'src/modules/collections/entities/collections.entity';
+import { ProductVariantEntity } from 'src/modules/product-variants/entities/product-variants.entity';
+import { ProductColorEntity } from 'src/modules/product-colors/entities/product-colors.entity';
 
 @Entity({ name: 'products' })
 export class ProductEntity {
@@ -71,8 +73,10 @@ export class ProductEntity {
   @JoinColumn({ name: 'categoryId' })
   category: CategoryEntity;
 
-  @OneToMany('ProductVariantEntity', 'product')
-  variants: any[];
+  @OneToMany(() => ProductVariantEntity, (variant) => variant.product)
+  variants: ProductVariantEntity[];
+  @OneToMany(() => ProductColorEntity, (productColor) => productColor.product)
+  colors: ProductColorEntity[];
   @ManyToMany(() => CollectionEntity, (collection) => collection.products)
   collections: CollectionEntity[];
 }
