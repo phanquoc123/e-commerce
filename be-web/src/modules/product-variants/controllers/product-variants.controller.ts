@@ -25,7 +25,9 @@ import { ProductVariantEntity } from '../entities/product-variants.entity';
 @ApiTags('Product Variants')
 @Controller('product-variants')
 export class ProductVariantsController {
-  constructor(private readonly productVariantsService: ProductVariantsService) {}
+  constructor(
+    private readonly productVariantsService: ProductVariantsService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Tạo biến thể sản phẩm mới' })
@@ -35,7 +37,9 @@ export class ProductVariantsController {
     description: 'Tạo biến thể sản phẩm thành công',
     type: ProductVariantEntity,
   })
-  create(@Body() createProductVariantDto: CreateProductVariantDto): Promise<ProductVariantEntity> {
+  create(
+    @Body() createProductVariantDto: CreateProductVariantDto,
+  ): Promise<ProductVariantEntity> {
     return this.productVariantsService.create(createProductVariantDto);
   }
 
@@ -52,7 +56,9 @@ export class ProductVariantsController {
     description: 'Lấy danh sách biến thể sản phẩm thành công',
     type: [ProductVariantEntity],
   })
-  findAll(@Query('productId') productId?: number): Promise<ProductVariantEntity[]> {
+  findAll(
+    @Query('productId') productId?: number,
+  ): Promise<ProductVariantEntity[]> {
     if (productId) {
       return this.productVariantsService.findByProduct(productId);
     }
@@ -60,8 +66,26 @@ export class ProductVariantsController {
   }
 
   @Get('product/:slug')
-  @ApiOperation({ summary: 'Lấy chi tiết sản phẩm đầy đủ (bao gồm màu, ảnh, sizes, variants)' })
-  @ApiParam({ name: 'slug', description: 'Slug của sản phẩm', type: 'string' })
+  @ApiOperation({
+    summary: 'Lấy chi tiết sản phẩm đầy đủ (bao gồm màu, ảnh, sizes, variants)',
+  })
+  @ApiParam({
+    name: 'slug',
+    description: 'Slug của sản phẩm',
+    type: 'string',
+  })
+  @ApiQuery({
+    name: 'colorId',
+    required: false,
+    description: 'ID của màu sắc để lọc',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'sizeId',
+    required: false,
+    description: 'ID của size để lọc',
+    type: Number,
+  })
   @ApiResponse({
     status: 200,
     description: 'Lấy chi tiết sản phẩm thành công',
@@ -126,13 +150,25 @@ export class ProductVariantsController {
     status: 404,
     description: 'Không tìm thấy sản phẩm',
   })
-  getProductDetail(@Param('slug') slug: string) {
-    return this.productVariantsService.getProductDetail(slug);
+  getProductDetail(
+    @Param('slug') slug: string,
+    @Query('colorId') colorId?: number,
+    @Query('sizeId') sizeId?: number,
+  ) {
+    return this.productVariantsService.getProductDetail(
+      slug,
+      colorId ? Number(colorId) : null,
+      sizeId ? Number(sizeId) : null,
+    );
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Lấy thông tin biến thể sản phẩm theo ID' })
-  @ApiParam({ name: 'id', description: 'ID của biến thể sản phẩm', type: 'number' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của biến thể sản phẩm',
+    type: 'number',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lấy thông tin biến thể sản phẩm thành công',
@@ -142,13 +178,19 @@ export class ProductVariantsController {
     status: 404,
     description: 'Không tìm thấy biến thể sản phẩm',
   })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<ProductVariantEntity> {
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ProductVariantEntity> {
     return this.productVariantsService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Cập nhật thông tin biến thể sản phẩm' })
-  @ApiParam({ name: 'id', description: 'ID của biến thể sản phẩm', type: 'number' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của biến thể sản phẩm',
+    type: 'number',
+  })
   @ApiBody({ type: UpdateProductVariantDto })
   @ApiResponse({
     status: 200,
@@ -168,7 +210,11 @@ export class ProductVariantsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Xóa biến thể sản phẩm' })
-  @ApiParam({ name: 'id', description: 'ID của biến thể sản phẩm', type: 'number' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID của biến thể sản phẩm',
+    type: 'number',
+  })
   @ApiResponse({
     status: 200,
     description: 'Xóa biến thể sản phẩm thành công',

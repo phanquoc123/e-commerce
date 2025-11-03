@@ -569,19 +569,19 @@ async function seedAll() {
       imagesToSeed.push(
         {
           productColorId: productColor.id,
-          imageUrl: `https://via.placeholder.com/800/${hexCode.slice(1)}/FFFFFF?text=Main+Image`,
+          imageUrl: `https://buggy.yodycdn.com/images/product/d582319058cd3cee3bf4ee348dc656d2.webp?width=987&height=1316`,
           isMain: true,
           sortOrder: 1,
         },
         {
           productColorId: productColor.id,
-          imageUrl: `https://via.placeholder.com/800/${hexCode.slice(1)}/FFFFFF?text=Image+2`,
+          imageUrl: `https://buggy.yodycdn.com/images/product/fe9d20ac0bc097e193ed2b48084f1c9f.webp?width=431&height=575`,
           isMain: false,
           sortOrder: 2,
         },
         {
           productColorId: productColor.id,
-          imageUrl: `https://via.placeholder.com/800/${hexCode.slice(1)}/FFFFFF?text=Image+3`,
+          imageUrl: `https://buggy.yodycdn.com/images/product/fe9d20ac0bc097e193ed2b48084f1c9f.webp?width=431&height=575`,
           isMain: false,
           sortOrder: 3,
         },

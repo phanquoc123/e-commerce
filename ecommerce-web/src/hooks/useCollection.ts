@@ -59,13 +59,7 @@ export const useCollectionWithProducts = () => {
     queryFn: async () => {
       try {
         const response = await collectionService.getAllCollectionWithProducts();
-        // console.log('📦 Full response:', response);
-        // console.log('📋 Response.data:', response.data);
-
-        // Backend response format: { data: { data: { result: [...] } } }
         const result = response.data?.data?.result;
-        // console.log('✅ Parsed result:', result);
-
         return result;
       } catch (error) {
         console.error('❌ Error in collectionWithProducts:', error);

@@ -15,8 +15,12 @@ export class ProductVariantsService {
     private readonly productRepository: Repository<ProductEntity>,
   ) {}
 
-  async create(createProductVariantDto: CreateProductVariantDto): Promise<ProductVariantEntity> {
-    const productVariant = this.productVariantRepository.create(createProductVariantDto);
+  async create(
+    createProductVariantDto: CreateProductVariantDto,
+  ): Promise<ProductVariantEntity> {
+    const productVariant = this.productVariantRepository.create(
+      createProductVariantDto,
+    );
     return await this.productVariantRepository.save(productVariant);
   }
 
@@ -40,9 +44,12 @@ export class ProductVariantsService {
     return productVariant;
   }
 
-  async update(id: number, updateProductVariantDto: UpdateProductVariantDto): Promise<ProductVariantEntity> {
+  async update(
+    id: number,
+    updateProductVariantDto: UpdateProductVariantDto,
+  ): Promise<ProductVariantEntity> {
     const productVariant = await this.findOne(id);
-    
+
     Object.assign(productVariant, updateProductVariantDto);
     return await this.productVariantRepository.save(productVariant);
   }
@@ -63,20 +70,26 @@ export class ProductVariantsService {
   /**
    * Lấy chi tiết sản phẩm với đầy đủ thông tin màu sắc, hình ảnh, sizes và variants
    * @param slug - Slug của sản phẩm
+   * @param colorId - ID của màu sắc (tùy chọn)
+   * @param sizeId - ID của size (tùy chọn)
    * @returns Chi tiết sản phẩm đầy đủ
    */
-  async getProductDetail(slug: string) {
+  async getProductDetail(
+    slug: string,
+    colorId?: number | null,
+    sizeId?: number | null,
+  ) {
     // Lấy thông tin sản phẩm cơ bản
     const product = await this.productRepository.findOne({
       where: { slug, isActive: true },
-      relations: ['category'],
+      // relations: ['category'],
     });
 
     if (!product) {
       throw new NotFoundException(`Product with slug "${slug}" not found`);
     }
 
-    // Lấy chi tiết màu sắc, hình ảnh và variants thông qua raw query
+    // Lấy chi tiết màu sắc, hình ảnh và variants thông qua raw query (trả về tất cả)
     const productColorsData = await this.productRepository.manager.query(
       `
       SELECT 
@@ -121,6 +134,10 @@ export class ProductVariantsService {
           hexCode: row.colorHexCode,
           thumbnailUrl: row.colorThumbnailUrl,
           productColorId: row.productColorId,
+          isSelected:
+            colorId !== null &&
+            colorId !== undefined &&
+            row.colorId === colorId,
           images: [],
           sizes: [],
           variants: [],
@@ -148,6 +165,8 @@ export class ProductVariantsService {
           id: row.sizeId,
           name: row.sizeName,
           code: row.sizeCode,
+          isSelected:
+            sizeId !== null && sizeId !== undefined && row.sizeId === sizeId,
         });
       }
 
@@ -156,6 +175,12 @@ export class ProductVariantsService {
         row.variantId &&
         !colorData.variants.find((v) => v.id === row.variantId)
       ) {
+        const isVariantSelected =
+          (colorId === null ||
+            colorId === undefined ||
+            row.colorId === colorId) &&
+          (sizeId === null || sizeId === undefined || row.sizeId === sizeId);
+
         colorData.variants.push({
           id: row.variantId,
           sku: row.sku,
@@ -165,13 +190,14 @@ export class ProductVariantsService {
           sizeId: row.sizeId,
           sizeName: row.sizeName,
           sizeCode: row.sizeCode,
+          isSelected: isVariantSelected,
         });
       }
     });
 
     const colors = Array.from(colorsMap.values());
 
-    // Lấy danh sách variants kèm images theo từng variant (images theo màu của variant)
+    // Lấy danh sách variants kèm images theo từng variant (images theo màu của variant) - trả về tất cả
     const variantsRaw = await this.productRepository.manager.query(
       `
       SELECT 
@@ -206,6 +232,12 @@ export class ProductVariantsService {
     const variantsMap = new Map();
     variantsRaw.forEach((row) => {
       if (!variantsMap.has(row.variantId)) {
+        const isVariantSelected =
+          (colorId === null ||
+            colorId === undefined ||
+            row.colorId === colorId) &&
+          (sizeId === null || sizeId === undefined || row.sizeId === sizeId);
+
         variantsMap.set(row.variantId, {
           id: row.variantId,
           sku: row.sku,
@@ -215,6 +247,7 @@ export class ProductVariantsService {
           colorId: row.colorId,
           productColorId: row.productColorId,
           sizeId: row.sizeId,
+          isSelected: isVariantSelected,
           color: row.colorId
             ? {
                 id: row.colorId,
@@ -230,7 +263,10 @@ export class ProductVariantsService {
         });
       }
       const variant = variantsMap.get(row.variantId);
-      if (row.imageId && !variant.images.find((img) => img.id === row.imageId)) {
+      if (
+        row.imageId &&
+        !variant.images.find((img) => img.id === row.imageId)
+      ) {
         variant.images.push({
           id: row.imageId,
           imageUrl: row.imageUrl,
@@ -258,13 +294,8 @@ export class ProductVariantsService {
       salePrice: product.salePrice,
       discountPercent,
       isActive: product.isActive,
-      category: product.category
-        ? {
-            id: product.category.id,
-            name: product.category.name,
-            slug: product.category.slug,
-          }
-        : null,
+      selectedColorId: colorId || null,
+      selectedSizeId: sizeId || null,
       colors: colors,
       variants: variants,
       createdAt: product.createdAt,

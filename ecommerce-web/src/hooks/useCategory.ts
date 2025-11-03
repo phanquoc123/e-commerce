@@ -48,13 +48,7 @@ export const useCategories = () => {
     queryFn: async () => {
       try {
         const response = await categoryService.getAllCategories();
-        console.log('📦 Full response:', response);
-        console.log('📋 Response.data:', response.data);
-        
-        // Backend response format: { data: { data: { result: [...] } } }
         const result = response.data?.data?.result || response.data?.result || [];
-        console.log('✅ Parsed result:', result);
-        
         return result;
       } catch (error) {
         console.error('❌ Error in useCategories:', error);

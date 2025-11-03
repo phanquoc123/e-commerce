@@ -13,24 +13,24 @@ import { useProductDetail } from '../../../hooks/useProduct';
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { data: product } = useProductDetail(slug || '');
-  console.log('product', product);
+  // Ưu tiên colorId và sizeId, nếu không có thì mới dùng color và size
+  const urlColorId = useMemo(() => {
+    const colorId = searchParams.get('colorId');
+    if (colorId) return Number(colorId) || null;
+    const color = searchParams.get('color');
+    return color ? Number(color) || null : null;
+  }, [searchParams]);
 
-  const urlColorId = useMemo(
-    () => Number(searchParams.get('color') || searchParams.get('colorId') || 0) || null,
-    [searchParams]
-  );
-  const urlSizeId = useMemo(
-    () => Number(searchParams.get('size') || searchParams.get('sizeId') || 0) || null,
-    [searchParams]
-  );
+  const urlSizeId = useMemo(() => {
+    const sizeId = searchParams.get('sizeId');
+    if (sizeId) return Number(sizeId) || null;
+    const size = searchParams.get('size');
+    return size ? Number(size) || null : null;
+  }, [searchParams]);
+  const { data: product } = useProductDetail(slug ?? '', urlColorId, urlSizeId);
 
-  const [selectedColorHex, setSelectedColorHex] = useState<string | undefined>(undefined);
-  const [selectedSizeCode, setSelectedSizeCode] = useState<string | undefined>(undefined);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState<string>('');
-
-  
 
   // Helpers: mapping
   const colorByHex = useMemo(() => {
@@ -43,73 +43,105 @@ export default function ProductDetailPage() {
 
   const colorById = useMemo(() => {
     const map = new Map<number, any>();
-    product?.colors?.forEach(c => map.set(c.id, c));
+    product?.colors?.forEach(c => map.set(Number(c.id), c));
     return map;
   }, [product]);
 
-  // Initialize selection from URL or defaults
+  // Lấy selectedColorId và selectedSizeId từ API response
+  const selectedColorId = product?.selectedColorId ?? null;
+
+  const selectedSizeId = product?.selectedSizeId ?? null;
+
+  // Tìm màu được chọn dựa trên selectedColorId từ API
+  const selectedColor = useMemo(() => {
+    if (selectedColorId && colorById.has(selectedColorId)) {
+      return colorById.get(selectedColorId);
+    }
+    return product?.colors?.[0] || null;
+  }, [product, selectedColorId, colorById]);
+
+  const selectedColorHex = selectedColor?.hexCode || undefined;
+
+  // Tìm size được chọn dựa trên selectedSizeId từ API
+  const selectedSize = useMemo(() => {
+    if (selectedColor && selectedSizeId) {
+      return selectedColor.sizes?.find((s: any) => Number(s.id) === selectedSizeId) || null;
+    }
+    return selectedColor?.sizes?.[0] || null;
+  }, [selectedColor, selectedSizeId]);
+
+  const selectedSizeCode = selectedSize?.code || undefined;
+
+  // Normalize URL: xóa các params cũ (color, size) và chỉ giữ colorId, sizeId
   useEffect(() => {
-    if (!product) return;
+    const hasOldParams = searchParams.has('color') || searchParams.has('size');
+    const hasNewParams = searchParams.has('colorId') || searchParams.has('sizeId');
 
-    if (urlColorId && colorById.get(urlColorId)) {
-      const c = colorById.get(urlColorId);
-      setSelectedColorHex(c.hexCode || undefined);
-      if (urlSizeId) {
-        const size = c.sizes.find((s: any) => s.id === urlSizeId);
-        if (size) setSelectedSizeCode(size.code);
+    if (hasOldParams && hasNewParams) {
+      // Nếu có cả params cũ và mới, normalize về chỉ dùng params mới
+      const newParams = new URLSearchParams();
+      if (urlColorId) newParams.set('colorId', urlColorId.toString());
+      if (urlSizeId) newParams.set('sizeId', urlSizeId.toString());
+      setSearchParams(newParams, { replace: true });
+    } else if (hasOldParams && !hasNewParams) {
+      // Nếu chỉ có params cũ, chuyển sang params mới
+      const newParams = new URLSearchParams();
+      if (urlColorId) newParams.set('colorId', urlColorId.toString());
+      if (urlSizeId) newParams.set('sizeId', urlSizeId.toString());
+      if (newParams.toString()) {
+        setSearchParams(newParams, { replace: true });
       }
-      const main = c.images.find((i: any) => i.isMain) || c.images[0];
-      if (main) setSelectedImage(main.imageUrl);
-      return;
     }
+  }, [searchParams, urlColorId, urlSizeId]);
 
-    const firstColor = product.colors?.[0];
-    if (firstColor) {
-      setSelectedColorHex(firstColor.hexCode || undefined);
-      const main = firstColor.images.find((i: any) => i.isMain) || firstColor.images[0];
-      if (main) setSelectedImage(main.imageUrl);
-      const firstSize = firstColor.sizes?.[0];
-      if (firstSize) setSelectedSizeCode(firstSize.code);
+  // Initialize image từ màu được chọn
+  useEffect(() => {
+    if (!selectedColor) return;
+
+    const main = selectedColor.images?.find((i: any) => i.isMain) || selectedColor.images?.[0];
+    if (main) {
+      setSelectedImage(main.imageUrl);
     }
-  }, [product, urlColorId, urlSizeId, colorById]);
+  }, [selectedColor]);
 
-  // Build options for UI
+  // Build options for UI với isSelected từ API
   const colorOptions = useMemo(() => {
     return (product?.colors || []).map(c => ({
+      id: Number(c.id),
       name: c.name,
       value: c.hexCode || '#ccc',
-      selected: selectedColorHex === c.hexCode,
+      selected: selectedColorId !== null && Number(c.id) === selectedColorId,
     }));
-  }, [product, selectedColorHex]);
+  }, [product, selectedColorId]);
 
   const sizesForSelectedColor = useMemo(() => {
-    const color = selectedColorHex ? colorByHex.get(selectedColorHex) : null;
-    return (color?.sizes || []).map((s: any) => ({
+    return (selectedColor?.sizes || []).map((s: any) => ({
+      id: Number(s.id),
       name: s.name,
       value: s.code,
-      selected: selectedSizeCode === s.code,
+      selected: selectedSizeId !== null && Number(s.id) === selectedSizeId,
     }));
-  }, [colorByHex, selectedColorHex, selectedSizeCode]);
+  }, [selectedColor, selectedSizeId]);
 
-  // Determine active variant by current color+size selection
+  // Determine active variant by current color+size selection từ API
   const activeVariant = useMemo(() => {
-    if (!product) return null;
-    const color = selectedColorHex ? colorByHex.get(selectedColorHex) : null;
-    if (!color) return null;
+    if (!product || !selectedColorId) return null;
+
     return (
       product.variants?.find(
         (v: any) =>
-          (v.colorId === color.id || v.productColorId === color.productColorId) &&
-          (selectedSizeCode ? v.size?.code === selectedSizeCode : true)
+          Number(v.colorId) === selectedColorId &&
+          (selectedSizeId ? Number(v.sizeId) === selectedSizeId : true)
       ) || null
     );
-  }, [product, colorByHex, selectedColorHex, selectedSizeCode]);
+  }, [product, selectedColorId, selectedSizeId]);
 
   const handleAddToCart = () => {
     console.log('Thêm vào giỏ hàng:', {
       product: product?.name,
-      colorHex: selectedColorHex,
-      sizeCode: selectedSizeCode,
+      productId: product?.id,
+      colorId: selectedColorId,
+      sizeId: selectedSizeId,
       quantity,
     });
   };
@@ -124,9 +156,8 @@ export default function ProductDetailPage() {
             <div className="flex gap-3">
               <ProductImageGallery
                 images={(() => {
-                  if (selectedColorHex) {
-                    const c = colorByHex.get(selectedColorHex);
-                    return (c?.images || []).map((i: any) => i.imageUrl);
+                  if (selectedColor) {
+                    return (selectedColor.images || []).map((i: any) => i.imageUrl);
                   }
                   return [] as string[];
                 })()}
@@ -147,8 +178,8 @@ export default function ProductDetailPage() {
                   <img
                     className="aspect-[8/1] h-auto w-full object-cover"
                     loading="lazy"
-                    src="./images/product/image-bottom.webp"
-                    alt=""
+                    src="../images/product/image-bottom.webp"
+                    alt="Sale Image"
                   />
                 </div>
               </div>
@@ -172,19 +203,43 @@ export default function ProductDetailPage() {
               colors={colorOptions}
               sizes={sizesForSelectedColor}
               selectedColor={selectedColorHex}
+              selectedColorName={selectedColor?.name}
               selectedSize={selectedSizeCode}
               onColorSelect={hex => {
-                setSelectedColorHex(hex);
                 const c = colorByHex.get(hex);
-                const main = c?.images?.find((i: any) => i.isMain) || c?.images?.[0];
-                if (main) setSelectedImage(main.imageUrl);
-                const firstSize = c?.sizes?.[0];
-                if (firstSize) setSelectedSizeCode(firstSize.code);
-               
+                if (!c) return;
+
+                const newParams = new URLSearchParams();
+                newParams.set('colorId', Number(c.id).toString());
+
+                // Nếu có size của màu mới, giữ nguyên hoặc chọn size đầu tiên
+                const firstSize = c.sizes?.[0];
+                if (firstSize && !selectedSizeId) {
+                  newParams.set('sizeId', Number(firstSize.id).toString());
+                } else if (selectedSizeId) {
+                  // Kiểm tra xem size hiện tại có trong màu mới không
+                  const sizeExists = c.sizes?.some((s: any) => Number(s.id) === selectedSizeId);
+                  if (!sizeExists && firstSize) {
+                    newParams.set('sizeId', Number(firstSize.id).toString());
+                  } else if (sizeExists) {
+                    newParams.set('sizeId', selectedSizeId.toString());
+                  }
+                }
+                setSearchParams(newParams, { replace: true });
               }}
               onSizeSelect={code => {
-                setSelectedSizeCode(code);
-              
+                // Tìm sizeId từ code
+                const size = selectedColor?.sizes?.find((s: any) => s.code === code);
+                if (!size) return;
+
+                // Update URL params để gọi lại API với sizeId mới
+                // Xóa các params cũ (color, size) và chỉ dùng colorId, sizeId
+                const newParams = new URLSearchParams();
+                if (selectedColorId) {
+                  newParams.set('colorId', selectedColorId.toString());
+                }
+                newParams.set('sizeId', Number(size.id).toString());
+                setSearchParams(newParams, { replace: true });
               }}
             />
 

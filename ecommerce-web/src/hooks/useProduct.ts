@@ -108,22 +108,21 @@ export interface ProductDetailResult {
   discountPercent: number | null;
   isActive: boolean;
   category: CategoryBrief | null;
+  selectedColorId: number | null;
+  selectedSizeId: number | null;
   colors: ProductColorItem[];
   variants: ProductVariantItem[];
   createdAt: string;
   updatedAt: string;
 }
 // Get all categories hook
-export const useProductDetail = (slug: string) => {
+export const useProductDetail = (slug: string, colorId: number | null, sizeId: number | null) => {
   return useQuery({
-    queryKey: ['productDetail', slug],
+    queryKey: ['productDetail', slug, colorId, sizeId],
     queryFn: async () => {
       try {
-        const response = await productService.getProductDetail(slug);
-        // console.log(response.data?.data?.result);
+        const response = await productService.getProductDetail(slug, colorId, sizeId);
         const data = response.data?.data?.result as ProductDetailResult;
-
-        // Support both wrapped and direct responses
 
         return data;
       } catch (error) {

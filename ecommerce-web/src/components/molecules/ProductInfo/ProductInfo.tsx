@@ -23,7 +23,7 @@ export default function ProductInfo({ name, price, salePrice }: ProductInfoProps
           </p>
         )}
       </div>
-      <h1 className="text-body-md line-clamp-1 whitespace-nowrap lg:line-clamp-2 lg:text-[16px] lg:font-light lg:leading-8">
+      <h1 className="text-body-md line-clamp-1 whitespace-nowrap lg:line-clamp-2 lg:text-[20px] lg:font-normal lg:leading-8">
         {name}
       </h1>
     </div>
