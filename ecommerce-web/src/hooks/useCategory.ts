@@ -48,7 +48,8 @@ export const useCategories = () => {
     queryFn: async () => {
       try {
         const response = await categoryService.getAllCategories();
-        const result = response.data?.data?.result || response.data?.result || [];
+        // Handle correct BE structure: response.data.data.result
+        const result = response.data?.data?.result || [];
         return result;
       } catch (error) {
         console.error('❌ Error in useCategories:', error);

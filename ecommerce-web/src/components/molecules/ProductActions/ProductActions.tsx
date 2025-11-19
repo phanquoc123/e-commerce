@@ -1,22 +1,25 @@
+import { memo, useState } from 'react';
+
 interface ProductActionsProps {
-  quantity: number;
-  onQuantityChange: (quantity: number) => void;
-  onAddToCart: () => void;
+  onAddToCart: (quantity: number) => void;
 }
 
-export default function ProductActions({
-  quantity,
-  onQuantityChange,
-  onAddToCart,
-}: ProductActionsProps) {
+function ProductActions({ onAddToCart }: ProductActionsProps) {
+  const [quantity, setQuantity] = useState(1);
+  console.log('ProductActions render');
+
   const handleDecrease = () => {
     if (quantity > 1) {
-      onQuantityChange(quantity - 1);
+      setQuantity(quantity - 1);
     }
   };
 
   const handleIncrease = () => {
-    onQuantityChange(quantity + 1);
+    setQuantity(quantity + 1);
+  };
+
+  const handleAddToCartClick = () => {
+    onAddToCart(quantity);
   };
 
   return (
@@ -47,7 +50,7 @@ export default function ProductActions({
             inputMode="numeric"
             type="number"
             value={quantity}
-            onChange={e => onQuantityChange(parseInt(e.target.value) || 1)}
+            onChange={e => setQuantity(parseInt(e.target.value) || 1)}
             min="1"
           />
           <span className="size-5 min-w-5 cursor-pointer" onClick={handleIncrease}>
@@ -71,7 +74,7 @@ export default function ProductActions({
       <button
         className="focus-visible:ring-ring bg-brand-surface text-theme-text hover:bg-brand-surface-hover [&_svg]:text-theme-text text-label-md inline-flex h-11 w-full items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 py-3 font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-5 [&_svg]:shrink-0"
         aria-label="Add to cart"
-        onClick={onAddToCart}
+        onClick={handleAddToCartClick}
       >
         Thêm vào giỏ
         <span className="focus-visible:ring-ring rounded-rounded inline-flex size-5 min-w-5 items-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0">
@@ -97,3 +100,5 @@ export default function ProductActions({
     </div>
   );
 }
+
+export default memo(ProductActions);

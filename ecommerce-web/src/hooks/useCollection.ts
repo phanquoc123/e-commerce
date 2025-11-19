@@ -59,11 +59,14 @@ export const useCollectionWithProducts = () => {
     queryFn: async () => {
       try {
         const response = await collectionService.getAllCollectionWithProducts();
-        const result = response.data?.data?.result;
-        return result;
+        // Handle both backend response structure and MSW mock structure
+        // Backend: response.data.data.result
+        // MSW: response.data.data
+        const result = response.data?.data?.result || response.data?.data;
+        return result || [];
       } catch (error) {
         console.error('❌ Error in collectionWithProducts:', error);
-        // return []; // Return empty array to prevent undefined error
+        return []; // Return empty array to prevent undefined error
       }
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

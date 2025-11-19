@@ -1,4 +1,99 @@
-# React + TypeScript + Vite
+# E-commerce Web - React + TypeScript + Vite
+
+Ứng dụng web thương mại điện tử được xây dựng với React, TypeScript, Vite và TailwindCSS.
+
+## 🚀 Công nghệ sử dụng
+
+- **React 19** - Thư viện UI
+- **TypeScript** - Type safety
+- **Vite** (Rolldown) - Build tool & dev server
+- **TailwindCSS** - CSS framework
+- **React Query** - Data fetching & caching
+- **React Router** - Routing
+- **Axios** - HTTP client
+- **MSW (Mock Service Worker)** - API mocking
+- **Storybook** - Component development
+- **Vitest** - Testing framework
+
+## 📦 Cài đặt
+
+```bash
+npm install
+```
+
+## 🛠️ Development
+
+### Chạy ứng dụng
+
+```bash
+npm run dev
+```
+
+Ứng dụng sẽ chạy tại `http://localhost:5173`
+
+### Mock Service Worker (MSW)
+
+Dự án sử dụng MSW để mock API trong môi trường development. MSW sẽ tự động intercept các API calls và trả về mock data.
+
+**Cấu hình:**
+- Mock handlers: `src/mocks/handlers.ts`
+- Browser setup: `src/mocks/browser.ts`
+- Node setup: `src/mocks/node.ts`
+- Service worker: `public/mockServiceWorker.js`
+
+**API Endpoints được mock:**
+- `GET /api/categories/tree` - Lấy cây danh mục
+- `GET /api/categories/:id` - Lấy danh mục theo ID
+- `GET /api/collections/with-products` - Lấy bộ sưu tập kèm sản phẩm
+- `GET /api/product-variants/product/:slug` - Lấy chi tiết sản phẩm
+- `POST /api/categories` - Tạo danh mục mới
+
+MSW chỉ hoạt động trong development mode (`import.meta.env.DEV`). Trong production, các API calls sẽ gửi đến backend thật.
+
+### Chạy Storybook
+
+```bash
+npm run storybook
+```
+
+Storybook sẽ chạy tại `http://localhost:6006`
+
+## 🏗️ Build
+
+```bash
+npm run build
+```
+
+## 🧪 Testing
+
+```bash
+npm run test
+```
+
+## 📝 Scripts
+
+- `npm run dev` - Chạy dev server
+- `npm run build` - Build production
+- `npm run preview` - Preview production build
+- `npm run lint` - Chạy ESLint
+- `npm run lint:fix` - Fix ESLint errors
+- `npm run format` - Format code với Prettier
+- `npm run format:check` - Check format
+- `npm run storybook` - Chạy Storybook
+- `npm run build-storybook` - Build Storybook
+
+## 🌍 Biến môi trường
+
+Tạo file `.env` từ `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+**Biến môi trường:**
+- `VITE_API_URL` - Base URL của backend API (mặc định: `http://localhost:4000/api`)
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

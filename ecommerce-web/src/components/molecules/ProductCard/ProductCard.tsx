@@ -49,15 +49,16 @@ export default function ProductCard({ product, className = '', onClick }: Produc
     if (selectedColor && selectedColor.images.length > 0) {
       // Lấy ảnh main hoặc ảnh đầu tiên
       const mainImage = selectedColor.images.find(img => img.isMain);
-      return mainImage?.imageUrl || selectedColor.images[0]?.imageUrl;
+      return mainImage?.imageUrl || selectedColor.images[0]?.imageUrl || '/images/product/product-detail.webp';
     }
     // Fallback: lấy ảnh đầu tiên của màu đầu tiên
     if (product.colors && product.colors.length > 0) {
       const firstColor = product.colors[0];
       const mainImage = firstColor.images.find(img => img.isMain);
-      return mainImage?.imageUrl || firstColor.images[0]?.imageUrl;
+      return mainImage?.imageUrl || firstColor.images[0]?.imageUrl || '/images/product/product-detail.webp';
     }
-    return '';
+    // Return placeholder image instead of empty string
+    return '/images/product/product-detail.webp';
   };
 
   // Tính % discount nếu có sale

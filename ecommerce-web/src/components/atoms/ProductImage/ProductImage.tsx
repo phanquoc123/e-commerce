@@ -26,13 +26,16 @@ export default function ProductImage({
     return `/product/${slug}${params.toString() ? `?${params.toString()}` : ''}`;
   };
 
+  // Use placeholder if src is empty
+  const imageSrc = src || '/images/product/product-detail.webp';
+
   return (
     <div
       className={`relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-md bg-slate-400${className}`}
     >
       <a href={getProductUrl()}>
         <img
-          src={src}
+          src={imageSrc}
           alt={alt}
           className="h-full w-full object-cover transition-transform lg:min-h-full"
           loading="lazy"

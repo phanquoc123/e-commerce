@@ -1,4 +1,7 @@
-export default function Breadcrums() {
+import { memo } from 'react';
+
+function Breadcrums() {
+  console.log('Breadcrums render');
   return (
     <>
       <nav className="border-border-primary hidden border-b border-t px-12 py-4 lg:block">
@@ -24,3 +27,5 @@ export default function Breadcrums() {
     </>
   );
 }
+
+export default memo(Breadcrums);

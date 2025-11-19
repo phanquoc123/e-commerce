@@ -4,11 +4,14 @@ interface BannerProductProps {
 }
 
 export default function BannerProduct({ href, src }: BannerProductProps) {
+  // Don't render if src is empty or undefined
+  if (!src) {
+    return null;
+  }
+
   return (
-    <>
-      <a href={href}>
-        <img className="rounded-xl" src={src} alt="" loading="lazy" />
-      </a>
-    </>
+    <a href={href || '#'}>
+      <img className="rounded-xl" src={src} alt="Banner" loading="lazy" />
+    </a>
   );
 }

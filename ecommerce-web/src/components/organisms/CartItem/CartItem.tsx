@@ -31,6 +31,9 @@ export default function CartItem({
   onDelete,
 }: CartItemProps) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  
+  // Use placeholder if image is empty
+  const imageSrc = image || '/images/product/product-detail.webp';
 
   return (
     <>
@@ -45,7 +48,7 @@ export default function CartItem({
           {/* Image */}
           <div className="relative h-[116px] w-[88px] min-w-[88px] lg:aspect-[3/4] lg:h-[176px] lg:w-[132px] lg:min-w-[132px]">
             <img
-              src={image}
+              src={imageSrc}
               alt={name}
               className="size-full rounded-sm object-cover"
               width={88}

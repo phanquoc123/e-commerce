@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import BlackLine from '../../atoms/BlackLine/BlackLine';
 import Breadcrums from '../../molecules/Breadcrums/Breadcrums';
@@ -29,48 +29,23 @@ export default function ProductDetailPage() {
   }, [searchParams]);
   const { data: product } = useProductDetail(slug ?? '', urlColorId, urlSizeId);
 
-  const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState<string>('');
-
-  // Helpers: mapping
-  const colorByHex = useMemo(() => {
-    const map = new Map<string, any>();
-    product?.colors?.forEach(c => {
-      if (c.hexCode) map.set(c.hexCode, c);
-    });
-    return map;
-  }, [product]);
-
-  const colorById = useMemo(() => {
-    const map = new Map<number, any>();
-    product?.colors?.forEach(c => map.set(Number(c.id), c));
-    return map;
-  }, [product]);
+  console.log('productDetail render');
 
   // Lấy selectedColorId và selectedSizeId từ API response
   const selectedColorId = product?.selectedColorId ?? null;
-
   const selectedSizeId = product?.selectedSizeId ?? null;
 
-  // Tìm màu được chọn dựa trên selectedColorId từ API
-  const selectedColor = useMemo(() => {
-    if (selectedColorId && colorById.has(selectedColorId)) {
-      return colorById.get(selectedColorId);
-    }
-    return product?.colors?.[0] || null;
-  }, [product, selectedColorId, colorById]);
+  // Sử dụng ref để lưu giá trị mới nhất mà không trigger re-render
+  const productRef = useRef(product);
+  const selectedColorIdRef = useRef(selectedColorId);
+  const selectedSizeIdRef = useRef(selectedSizeId);
 
-  const selectedColorHex = selectedColor?.hexCode || undefined;
-
-  // Tìm size được chọn dựa trên selectedSizeId từ API
-  const selectedSize = useMemo(() => {
-    if (selectedColor && selectedSizeId) {
-      return selectedColor.sizes?.find((s: any) => Number(s.id) === selectedSizeId) || null;
-    }
-    return selectedColor?.sizes?.[0] || null;
-  }, [selectedColor, selectedSizeId]);
-
-  const selectedSizeCode = selectedSize?.code || undefined;
+  // Update refs khi giá trị thay đổi
+  useEffect(() => {
+    productRef.current = product;
+    selectedColorIdRef.current = selectedColorId;
+    selectedSizeIdRef.current = selectedSizeId;
+  }, [product, selectedColorId, selectedSizeId]);
 
   // Normalize URL: xóa các params cũ (color, size) và chỉ giữ colorId, sizeId
   useEffect(() => {
@@ -94,35 +69,6 @@ export default function ProductDetailPage() {
     }
   }, [searchParams, urlColorId, urlSizeId]);
 
-  // Initialize image từ màu được chọn
-  useEffect(() => {
-    if (!selectedColor) return;
-
-    const main = selectedColor.images?.find((i: any) => i.isMain) || selectedColor.images?.[0];
-    if (main) {
-      setSelectedImage(main.imageUrl);
-    }
-  }, [selectedColor]);
-
-  // Build options for UI với isSelected từ API
-  const colorOptions = useMemo(() => {
-    return (product?.colors || []).map(c => ({
-      id: Number(c.id),
-      name: c.name,
-      value: c.hexCode || '#ccc',
-      selected: selectedColorId !== null && Number(c.id) === selectedColorId,
-    }));
-  }, [product, selectedColorId]);
-
-  const sizesForSelectedColor = useMemo(() => {
-    return (selectedColor?.sizes || []).map((s: any) => ({
-      id: Number(s.id),
-      name: s.name,
-      value: s.code,
-      selected: selectedSizeId !== null && Number(s.id) === selectedSizeId,
-    }));
-  }, [selectedColor, selectedSizeId]);
-
   // Determine active variant by current color+size selection từ API
   const activeVariant = useMemo(() => {
     if (!product || !selectedColorId) return null;
@@ -136,15 +82,53 @@ export default function ProductDetailPage() {
     );
   }, [product, selectedColorId, selectedSizeId]);
 
-  const handleAddToCart = () => {
+  // Callback stable - không bao giờ thay đổi vì sử dụng ref
+  const handleAddToCart = useCallback((quantity: number) => {
     console.log('Thêm vào giỏ hàng:', {
-      product: product?.name,
-      productId: product?.id,
-      colorId: selectedColorId,
-      sizeId: selectedSizeId,
+      product: productRef.current?.name,
+      productId: productRef.current?.id,
+      colorId: selectedColorIdRef.current,
+      sizeId: selectedSizeIdRef.current,
       quantity,
     });
-  };
+  }, []); // Empty deps - callback không bao giờ thay đổi!
+
+  const handleColorSelect = useCallback(
+    (colorId: number) => {
+      const newColor = product?.colors?.find((c: any) => Number(c.id) === colorId);
+      if (!newColor) return;
+
+      const newParams = new URLSearchParams();
+      newParams.set('colorId', colorId.toString());
+
+      // Xử lý size: giữ nguyên nếu có trong màu mới, không thì chọn size đầu tiên
+      const firstSize = newColor.sizes?.[0];
+      if (firstSize && !selectedSizeId) {
+        newParams.set('sizeId', Number(firstSize.id).toString());
+      } else if (selectedSizeId) {
+        const sizeExists = newColor.sizes?.some((s: any) => Number(s.id) === selectedSizeId);
+        if (!sizeExists && firstSize) {
+          newParams.set('sizeId', Number(firstSize.id).toString());
+        } else if (sizeExists) {
+          newParams.set('sizeId', selectedSizeId.toString());
+        }
+      }
+      setSearchParams(newParams, { replace: true });
+    },
+    [product, selectedSizeId, setSearchParams]
+  );
+
+  const handleSizeSelect = useCallback(
+    (sizeId: number) => {
+      const newParams = new URLSearchParams();
+      if (selectedColorId) {
+        newParams.set('colorId', selectedColorId.toString());
+      }
+      newParams.set('sizeId', sizeId.toString());
+      setSearchParams(newParams, { replace: true });
+    },
+    [selectedColorId, setSearchParams]
+  );
 
   return (
     <MainLayout>
@@ -153,37 +137,11 @@ export default function ProductDetailPage() {
         <div className="mx-auto flex w-full flex-col lg:max-w-screen-2xl lg:flex-row lg:gap-12 lg:px-24 lg:py-8">
           {/* Product Images */}
           <div className="flex w-[648px] flex-col gap-8">
-            <div className="flex gap-3">
-              <ProductImageGallery
-                images={(() => {
-                  if (selectedColor) {
-                    return (selectedColor.images || []).map((i: any) => i.imageUrl);
-                  }
-                  return [] as string[];
-                })()}
-                selectedImage={selectedImage}
-                onImageSelect={setSelectedImage}
-                className="hidden lg:block"
-              />
-              <div className="relative flex-1">
-                <div className="lg:rounded-sm">
-                  <img
-                    className="aspect-[3/4] size-full min-w-full snap-center snap-always object-cover sm:object-contain lg:rounded-md"
-                    src={selectedImage}
-                    alt="Main product image"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="inset-x absolute bottom-0 z-[1] rotate-0">
-                  <img
-                    className="aspect-[8/1] h-auto w-full object-cover"
-                    loading="lazy"
-                    src="../images/product/image-bottom.webp"
-                    alt="Sale Image"
-                  />
-                </div>
-              </div>
-            </div>
+            <ProductImageGallery
+              colors={product?.colors}
+              selectedColorId={selectedColorId}
+              className="hidden lg:block"
+            />
           </div>
 
           {/* Product Details */}
@@ -200,56 +158,16 @@ export default function ProductDetailPage() {
             <BlackLine />
 
             <ProductOptions
-              colors={colorOptions}
-              sizes={sizesForSelectedColor}
-              selectedColor={selectedColorHex}
-              selectedColorName={selectedColor?.name}
-              selectedSize={selectedSizeCode}
-              onColorSelect={hex => {
-                const c = colorByHex.get(hex);
-                if (!c) return;
-
-                const newParams = new URLSearchParams();
-                newParams.set('colorId', Number(c.id).toString());
-
-                // Nếu có size của màu mới, giữ nguyên hoặc chọn size đầu tiên
-                const firstSize = c.sizes?.[0];
-                if (firstSize && !selectedSizeId) {
-                  newParams.set('sizeId', Number(firstSize.id).toString());
-                } else if (selectedSizeId) {
-                  // Kiểm tra xem size hiện tại có trong màu mới không
-                  const sizeExists = c.sizes?.some((s: any) => Number(s.id) === selectedSizeId);
-                  if (!sizeExists && firstSize) {
-                    newParams.set('sizeId', Number(firstSize.id).toString());
-                  } else if (sizeExists) {
-                    newParams.set('sizeId', selectedSizeId.toString());
-                  }
-                }
-                setSearchParams(newParams, { replace: true });
-              }}
-              onSizeSelect={code => {
-                // Tìm sizeId từ code
-                const size = selectedColor?.sizes?.find((s: any) => s.code === code);
-                if (!size) return;
-
-                // Update URL params để gọi lại API với sizeId mới
-                // Xóa các params cũ (color, size) và chỉ dùng colorId, sizeId
-                const newParams = new URLSearchParams();
-                if (selectedColorId) {
-                  newParams.set('colorId', selectedColorId.toString());
-                }
-                newParams.set('sizeId', Number(size.id).toString());
-                setSearchParams(newParams, { replace: true });
-              }}
+              colors={product?.colors}
+              selectedColorId={selectedColorId}
+              selectedSizeId={selectedSizeId}
+              onColorSelect={handleColorSelect}
+              onSizeSelect={handleSizeSelect}
             />
 
             <BlackLine />
 
-            <ProductActions
-              quantity={quantity}
-              onQuantityChange={setQuantity}
-              onAddToCart={handleAddToCart}
-            />
+            <ProductActions onAddToCart={handleAddToCart} />
             <StoreCommitment />
           </div>
         </div>

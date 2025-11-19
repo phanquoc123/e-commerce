@@ -1,4 +1,11 @@
 import type { Preview } from '@storybook/react-vite';
+import { initialize, mswLoader } from 'msw-storybook-addon';
+import { handlers } from '../src/mocks/handlers';
+
+// Initialize MSW for Storybook
+initialize({
+  onUnhandledRequest: 'bypass',
+});
 
 const preview: Preview = {
   parameters: {
@@ -15,7 +22,12 @@ const preview: Preview = {
       // 'off' - skip a11y checks entirely
       test: 'todo',
     },
+
+    msw: {
+      handlers: handlers,
+    },
   },
+  loaders: [mswLoader],
 };
 
 export default preview;

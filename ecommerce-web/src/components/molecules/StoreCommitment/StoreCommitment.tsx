@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 interface CommitmentItem {
   icon: string;
   text: string;
@@ -25,10 +27,11 @@ const defaultCommitments: CommitmentItem[] = [
   },
 ];
 
-export default function StoreCommitment({
+function StoreCommitment({
   title = 'YODY cam kết',
   commitments = defaultCommitments,
 }: StoreCommitmentProps) {
+  console.log('StoreCommitment render');
   return (
     <div className="border-border-primary space-y-2 rounded border-b bg-white px-3 py-6">
       <p className="text-theme-text text-heading-md">{title}</p>
@@ -68,3 +71,5 @@ export default function StoreCommitment({
     </div>
   );
 }
+
+export default memo(StoreCommitment);

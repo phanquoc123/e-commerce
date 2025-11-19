@@ -17,12 +17,15 @@ export default function OrderItemCard({
   finalPrice,
   className = ''
 }: OrderItemCardProps) {
+  // Use placeholder if imageUrl is empty
+  const imageSrc = imageUrl || '/images/product/product-detail.webp';
+  
   return (
     <div className={`flex flex-1 gap-3 ${className}`}>
       <div className="relative aspect-[3/4] h-[116px] w-[88px] min-w-[88px] lg:h-[176px] lg:w-[132px] lg:min-w-[132px]">
         <img
           className="size-full rounded-md object-cover"
-          src={imageUrl}
+          src={imageSrc}
           alt={name}
           width={88}
           height={116}
@@ -56,6 +59,14 @@ export default function OrderItemCard({
     </div>
   );
 }
+
+
+
+
+
+
+
+
 
 
 

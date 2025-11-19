@@ -1,10 +1,13 @@
+import { memo } from 'react';
+
 interface ProductInfoProps {
   name: string;
   price: number;
   salePrice?: number | null;
 }
 
-export default function ProductInfo({ name, price, salePrice }: ProductInfoProps) {
+function ProductInfo({ name, price, salePrice }: ProductInfoProps) {
+  console.log('ProductInfo render');
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 text-right">
@@ -29,3 +32,5 @@ export default function ProductInfo({ name, price, salePrice }: ProductInfoProps
     </div>
   );
 }
+
+export default memo(ProductInfo);
