@@ -118,7 +118,7 @@ export interface ProductDetailResult {
 // Get all categories hook
 export const useProductDetail = (slug: string, colorId: number | null, sizeId: number | null) => {
   return useQuery({
-    queryKey: ['productDetail', slug, colorId, sizeId],
+    queryKey: ['productDetail', slug], // Chỉ dùng slug - không fetch lại khi đổi màu/size
     queryFn: async () => {
       try {
         const response = await productService.getProductDetail(slug, colorId, sizeId);

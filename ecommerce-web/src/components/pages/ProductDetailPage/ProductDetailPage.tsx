@@ -29,11 +29,20 @@ export default function ProductDetailPage() {
   }, [searchParams]);
   const { data: product } = useProductDetail(slug ?? '', urlColorId, urlSizeId);
 
-  console.log('productDetail render');
+  // Lấy selectedColorId và selectedSizeId từ URL params (client-side)
+  // Nếu không có trong URL, lấy màu/size đầu tiên
+  const selectedColorId = useMemo(() => {
+    if (urlColorId) return urlColorId;
+    // Fallback: chọn màu đầu tiên nếu có
+    return product?.colors?.[0]?.id ? Number(product.colors[0].id) : null;
+  }, [urlColorId, product?.colors]);
 
-  // Lấy selectedColorId và selectedSizeId từ API response
-  const selectedColorId = product?.selectedColorId ?? null;
-  const selectedSizeId = product?.selectedSizeId ?? null;
+  const selectedSizeId = useMemo(() => {
+    if (urlSizeId) return urlSizeId;
+    // Fallback: chọn size đầu tiên của màu được chọn nếu có
+    const selectedColor = product?.colors?.find((c: any) => Number(c.id) === selectedColorId);
+    return selectedColor?.sizes?.[0]?.id ? Number(selectedColor.sizes[0].id) : null;
+  }, [urlSizeId, product?.colors, selectedColorId]);
 
   // Sử dụng ref để lưu giá trị mới nhất mà không trigger re-render
   const productRef = useRef(product);
@@ -47,27 +56,47 @@ export default function ProductDetailPage() {
     selectedSizeIdRef.current = selectedSizeId;
   }, [product, selectedColorId, selectedSizeId]);
 
-  // Normalize URL: xóa các params cũ (color, size) và chỉ giữ colorId, sizeId
+  // Auto-select default color and size khi lần đầu load
   useEffect(() => {
+    if (!product?.colors || product.colors.length === 0) return;
+
     const hasOldParams = searchParams.has('color') || searchParams.has('size');
     const hasNewParams = searchParams.has('colorId') || searchParams.has('sizeId');
 
+    // Normalize URL: xóa params cũ và chuyển sang params mới
     if (hasOldParams && hasNewParams) {
-      // Nếu có cả params cũ và mới, normalize về chỉ dùng params mới
       const newParams = new URLSearchParams();
       if (urlColorId) newParams.set('colorId', urlColorId.toString());
       if (urlSizeId) newParams.set('sizeId', urlSizeId.toString());
       setSearchParams(newParams, { replace: true });
-    } else if (hasOldParams && !hasNewParams) {
-      // Nếu chỉ có params cũ, chuyển sang params mới
+      return;
+    }
+
+    if (hasOldParams && !hasNewParams) {
       const newParams = new URLSearchParams();
       if (urlColorId) newParams.set('colorId', urlColorId.toString());
       if (urlSizeId) newParams.set('sizeId', urlSizeId.toString());
       if (newParams.toString()) {
         setSearchParams(newParams, { replace: true });
       }
+      return;
     }
-  }, [searchParams, urlColorId, urlSizeId]);
+
+    // Auto-select: Nếu chưa có colorId/sizeId trong URL, set mặc định
+    if (!urlColorId && !urlSizeId) {
+      const firstColor = product.colors[0];
+      const firstSize = firstColor?.sizes?.[0];
+      
+      if (firstColor) {
+        const newParams = new URLSearchParams();
+        newParams.set('colorId', String(firstColor.id));
+        if (firstSize) {
+          newParams.set('sizeId', String(firstSize.id));
+        }
+        setSearchParams(newParams, { replace: true });
+      }
+    }
+  }, [product, searchParams, urlColorId, urlSizeId, setSearchParams]);
 
   // Determine active variant by current color+size selection từ API
   const activeVariant = useMemo(() => {

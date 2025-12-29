@@ -53,11 +53,16 @@ export default function MegaMenu({ isOpen, onClose, className = '' }: MegaMenuPr
     }));
   }, [apiCategories]);
 
+  // Lock/unlock body scroll khi menu mở/đóng
   useEffect(() => {
     if (isOpen) {
+      // Ngăn scroll trang bên ngoài
+      document.body.style.overflow = 'hidden';
       // Delay để trigger animation
       setTimeout(() => setIsAnimating(true), 10);
     } else {
+      // Cho phép scroll lại
+      document.body.style.overflow = '';
       setIsAnimating(false);
       setSearchQuery(''); // Reset search khi đóng menu
       setSearchKey(prev => prev + 1); // Force re-render SearchBar để reset input
@@ -66,6 +71,11 @@ export default function MegaMenu({ isOpen, onClose, className = '' }: MegaMenuPr
       setSelectedCategoryImage(''); // Reset selected category image
       setSelectedCategories([]); // Reset selected categories
     }
+
+    // Cleanup: đảm bảo unlock scroll khi component unmount
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -82,7 +92,7 @@ export default function MegaMenu({ isOpen, onClose, className = '' }: MegaMenuPr
 
       {/* Mega Menu Content */}
       <div
-        className={`fixed left-0 right-0 top-0 z-[60] bg-white py-4 shadow-2xl transition-all duration-500 ease-out ${
+        className={`fixed left-0 right-0 top-0 z-[60] bg-white py-4 shadow-2xl transition-all duration-500 ease-in-out ${
           isAnimating ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
         } ${className}`}
       >
@@ -158,7 +168,7 @@ export default function MegaMenu({ isOpen, onClose, className = '' }: MegaMenuPr
 
         {/* Close button at bottom */}
         <div className="flex justify-center">
-          <CloseButton onClick={onClose} className="mb-4" />
+          <CloseButton onClick={onClose} />
         </div>
       </div>
     </>

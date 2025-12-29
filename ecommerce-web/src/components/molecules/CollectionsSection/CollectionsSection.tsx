@@ -18,7 +18,7 @@ export default function CollectionsSection({
 }: CollectionsSectionProps) {
   return (
     <div
-      className={`small-scrollbar flex max-h-[652px] gap-2 overflow-y-auto rounded-md bg-[#F3F4F6] px-3 py-2 lg:block lg:bg-white ${className}`}
+      className={`small-scrollbar flex h-[calc(100vh-260px)] max-h-[calc(100vh-260px)]   gap-2 overflow-y-auto rounded-md bg-[#F3F4F6] px-3 py-2 lg:block lg:bg-white ${className}`}
     >
       <CollectionIcon src={image} alt={title} className="lg:hidden" />
       <SectionTitle className="text-lg font-bold text-gray-900">{title}</SectionTitle>
