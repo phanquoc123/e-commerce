@@ -2,16 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 
 import { productService } from '../services/productService';
 
-// Backend response wrapper type
-// interface ApiResponse<T> {
-//   data: {
-//     status: number;
-//     message: string;
-//     success: boolean;
-//     result: T;
-//   };
-// }
-
 export interface CategoryBrief {
   id: number;
   name: string;

@@ -58,7 +58,7 @@ export default function QuantityInput({
         value={value}
         onChange={handleInputChange}
         disabled={disabled}
-        className="w-10 border-none bg-transparent text-center text-sm outline-none disabled:opacity-50"
+        className="w-10 pointer-events-none border-none bg-transparent text-center text-sm outline-none disabled:opacity-50"
         min={min}
         max={max}
       />

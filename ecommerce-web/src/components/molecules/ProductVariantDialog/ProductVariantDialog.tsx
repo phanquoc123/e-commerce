@@ -16,6 +16,8 @@ interface ProductVariantDialogProps {
   onClose: () => void;
   productName: string;
   productImage: string;
+  price?: number;
+  quantity?: number;
   selectedColor: string;
   selectedSize: string;
   colors: Color[];
@@ -30,6 +32,8 @@ export default function ProductVariantDialog({
   onClose,
   productName,
   productImage,
+  price,
+  quantity = 1,
   selectedColor,
   selectedSize,
   colors,
@@ -151,9 +155,22 @@ export default function ProductVariantDialog({
               />
               <div className="flex-1">
                 <p className="text-body-md text-theme-text mb-1 line-clamp-2">{productName}</p>
-                <p className="text-body-sm text-theme-text-secondary">
-                  {selectedColorData?.name}, {selectedSizeData?.name}
+                <p className="text-body-sm text-theme-text-secondary mb-2">
+                  {selectedColorData?.name}{selectedSizeData ? `, ${selectedSizeData.name}` : ''}
                 </p>
+                {price && (
+                  <div className="space-y-1">
+                    <p className="text-body-sm text-theme-text">
+                      Đơn giá: <span className="font-semibold text-red-600">{price.toLocaleString('vi-VN')}đ</span>
+                    </p>
+                    <p className="text-body-sm text-theme-text">
+                      Số lượng: <span className="font-semibold">{quantity}</span>
+                    </p>
+                    <p className="text-body-md text-theme-text">
+                      Thành tiền: <span className="font-bold text-red-600">{(price * quantity).toLocaleString('vi-VN')}đ</span>
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

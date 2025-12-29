@@ -9,6 +9,7 @@ import StoreCommitment from '../../molecules/StoreCommitment/StoreCommitment';
 import ProductImageGallery from '../../molecules/ProductImageGallery/ProductImageGallery';
 import { MainLayout } from '../../templates';
 import { useProductDetail } from '../../../hooks/useProduct';
+import { useAddToCart } from '../../../hooks/useCart';
 
 export default function ProductDetailPage() {
   const { slug } = useParams();
@@ -28,6 +29,7 @@ export default function ProductDetailPage() {
     return size ? Number(size) || null : null;
   }, [searchParams]);
   const { data: product } = useProductDetail(slug ?? '', urlColorId, urlSizeId);
+  const addToCart = useAddToCart();
 
   // Lấy selectedColorId và selectedSizeId từ URL params (client-side)
   // Nếu không có trong URL, lấy màu/size đầu tiên
@@ -43,18 +45,6 @@ export default function ProductDetailPage() {
     const selectedColor = product?.colors?.find((c: any) => Number(c.id) === selectedColorId);
     return selectedColor?.sizes?.[0]?.id ? Number(selectedColor.sizes[0].id) : null;
   }, [urlSizeId, product?.colors, selectedColorId]);
-
-  // Sử dụng ref để lưu giá trị mới nhất mà không trigger re-render
-  const productRef = useRef(product);
-  const selectedColorIdRef = useRef(selectedColorId);
-  const selectedSizeIdRef = useRef(selectedSizeId);
-
-  // Update refs khi giá trị thay đổi
-  useEffect(() => {
-    productRef.current = product;
-    selectedColorIdRef.current = selectedColorId;
-    selectedSizeIdRef.current = selectedSizeId;
-  }, [product, selectedColorId, selectedSizeId]);
 
   // Auto-select default color and size khi lần đầu load
   useEffect(() => {
@@ -111,16 +101,54 @@ export default function ProductDetailPage() {
     );
   }, [product, selectedColorId, selectedSizeId]);
 
-  // Callback stable - không bao giờ thay đổi vì sử dụng ref
-  const handleAddToCart = useCallback((quantity: number) => {
-    console.log('Thêm vào giỏ hàng:', {
-      product: productRef.current?.name,
-      productId: productRef.current?.id,
-      colorId: selectedColorIdRef.current,
-      sizeId: selectedSizeIdRef.current,
-      quantity,
-    });
-  }, []); // Empty deps - callback không bao giờ thay đổi!
+  // Handle add to cart
+  const handleAddToCart = useCallback(
+    (quantity: number) => {
+      if (!product || !activeVariant || !selectedColorId) {
+        alert('Vui lòng chọn màu và size');
+        return;
+      }
+
+      // Find color and size info
+      const selectedColor = product.colors?.find((c: any) => Number(c.id) === selectedColorId);
+      const selectedSize = selectedColor?.sizes?.find((s: any) => Number(s.id) === selectedSizeId);
+      const mainImage = selectedColor?.images?.find((img: any) => img.isMain);
+
+      if (!selectedColor) {
+        alert('Không tìm thấy thông tin màu sắc');
+        return;
+      }
+
+      addToCart.mutate(
+        {
+          productId: product.id,
+          productName: product.name,
+          productSlug: product.slug,
+          variantId: activeVariant.id,
+          sku: activeVariant.sku,
+          colorId: selectedColorId,
+          colorName: selectedColor.name,
+          colorHexCode: selectedColor.hexCode || null,
+          sizeId: selectedSizeId,
+          sizeName: selectedSize?.name || null,
+          sizeCode: selectedSize?.code || null,
+          price: activeVariant.price,
+          quantity: quantity,
+          imageUrl: mainImage?.imageUrl || selectedColor.thumbnailUrl || '',
+          stock: activeVariant.stock,
+        },
+        {
+          onSuccess: () => {
+            alert('✅ Đã thêm vào giỏ hàng!');
+          },
+          onError: (error: any) => {
+            alert(`❌ ${error.message}`);
+          },
+        }
+      );
+    },
+    [product, activeVariant, selectedColorId, selectedSizeId, addToCart]
+  );
 
   const handleColorSelect = useCallback(
     (colorId: number) => {

@@ -786,6 +786,83 @@ const createMockProductDetail = (colorId: number | null, sizeId: number | null) 
 };
 
 // ============================================
+// CART HELPERS - LocalStorage Management
+// ============================================
+const CART_STORAGE_KEY = 'ecommerce_cart';
+
+interface CartItem {
+  id: string; // unique cart item id
+  productId: number;
+  productName: string;
+  productSlug: string;
+  variantId: number;
+  sku: string;
+  colorId: number;
+  colorName: string;
+  colorHexCode: string | null;
+  sizeId: number | null;
+  sizeName: string | null;
+  sizeCode: string | null;
+  price: number;
+  quantity: number;
+  imageUrl: string;
+  stock: number;
+  addedAt: string;
+}
+
+interface Cart {
+  items: CartItem[];
+  totalItems: number;
+  totalPrice: number;
+  updatedAt: string;
+}
+
+// Get cart from localStorage
+const getCartFromStorage = (): Cart => {
+  try {
+    const cartData = localStorage.getItem(CART_STORAGE_KEY);
+    if (!cartData) {
+      return {
+        items: [],
+        totalItems: 0,
+        totalPrice: 0,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+    return JSON.parse(cartData);
+  } catch (error) {
+    console.error('Error reading cart from localStorage:', error);
+    return {
+      items: [],
+      totalItems: 0,
+      totalPrice: 0,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+};
+
+// Save cart to localStorage
+const saveCartToStorage = (cart: Cart): void => {
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  } catch (error) {
+    console.error('Error saving cart to localStorage:', error);
+  }
+};
+
+// Calculate cart totals
+const calculateCartTotals = (items: CartItem[]): { totalItems: number; totalPrice: number } => {
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  return { totalItems, totalPrice };
+};
+
+// Generate unique cart item id
+const generateCartItemId = (productId: number, variantId: number): string => {
+  return `${productId}_${variantId}_${Date.now()}`;
+};
+
+// ============================================
 // MSW HANDLERS
 // ============================================
 export const handlers = [
@@ -875,5 +952,285 @@ export const handlers = [
       },
       { status: 201 }
     );
+  }),
+
+  // ============================================
+  // CART APIs
+  // ============================================
+
+  // Get cart
+  http.get(`${API_BASE_URL}/cart`, () => {
+    const cart = getCartFromStorage();
+    return HttpResponse.json({
+      data: {
+        status: 200,
+        message: 'Success',
+        success: true,
+        result: cart,
+      },
+    });
+  }),
+
+  // Add item to cart
+  http.post(`${API_BASE_URL}/cart/items`, async ({ request }) => {
+    const body = (await request.json()) as {
+      productId: number;
+      productName: string;
+      productSlug: string;
+      variantId: number;
+      sku: string;
+      colorId: number;
+      colorName: string;
+      colorHexCode: string | null;
+      sizeId: number | null;
+      sizeName: string | null;
+      sizeCode: string | null;
+      price: number;
+      quantity: number;
+      imageUrl: string;
+      stock: number;
+    };
+
+    // Validate required fields
+    if (!body.productId || !body.variantId || !body.quantity) {
+      return HttpResponse.json(
+        {
+          data: {
+            status: 400,
+            message: 'Missing required fields',
+            success: false,
+            result: null,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate quantity
+    if (body.quantity <= 0 || body.quantity > body.stock) {
+      return HttpResponse.json(
+        {
+          data: {
+            status: 400,
+            message: `Invalid quantity. Available stock: ${body.stock}`,
+            success: false,
+            result: null,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    const cart = getCartFromStorage();
+
+    // Check if item already exists (same variantId)
+    const existingItemIndex = cart.items.findIndex(item => item.variantId === body.variantId);
+
+    if (existingItemIndex >= 0) {
+      // Update quantity of existing item
+      const existingItem = cart.items[existingItemIndex];
+      const newQuantity = existingItem.quantity + body.quantity;
+
+      // Check stock limit
+      if (newQuantity > body.stock) {
+        return HttpResponse.json(
+          {
+            data: {
+              status: 400,
+              message: `Cannot add more. Maximum stock available: ${body.stock}`,
+              success: false,
+              result: null,
+            },
+          },
+          { status: 400 }
+        );
+      }
+
+      cart.items[existingItemIndex].quantity = newQuantity;
+      cart.items[existingItemIndex].addedAt = new Date().toISOString();
+    } else {
+      // Add new item to cart
+      const newItem: CartItem = {
+        id: generateCartItemId(body.productId, body.variantId),
+        productId: body.productId,
+        productName: body.productName,
+        productSlug: body.productSlug,
+        variantId: body.variantId,
+        sku: body.sku,
+        colorId: body.colorId,
+        colorName: body.colorName,
+        colorHexCode: body.colorHexCode,
+        sizeId: body.sizeId,
+        sizeName: body.sizeName,
+        sizeCode: body.sizeCode,
+        price: body.price,
+        quantity: body.quantity,
+        imageUrl: body.imageUrl,
+        stock: body.stock,
+        addedAt: new Date().toISOString(),
+      };
+
+      cart.items.unshift(newItem); // Add to beginning of array
+    }
+
+    // Recalculate totals
+    const totals = calculateCartTotals(cart.items);
+    cart.totalItems = totals.totalItems;
+    cart.totalPrice = totals.totalPrice;
+    cart.updatedAt = new Date().toISOString();
+
+    // Save to localStorage
+    saveCartToStorage(cart);
+
+    return HttpResponse.json(
+      {
+        data: {
+          status: 201,
+          message: 'Item added to cart successfully',
+          success: true,
+          result: cart,
+        },
+      },
+      { status: 201 }
+    );
+  }),
+
+  // Update cart item quantity
+  http.put(`${API_BASE_URL}/cart/items/:id`, async ({ params, request }) => {
+    const { id } = params;
+    const body = (await request.json()) as { quantity: number };
+
+    if (!body.quantity || body.quantity <= 0) {
+      return HttpResponse.json(
+        {
+          data: {
+            status: 400,
+            message: 'Invalid quantity',
+            success: false,
+            result: null,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    const cart = getCartFromStorage();
+    const itemIndex = cart.items.findIndex(item => item.id === id);
+
+    if (itemIndex === -1) {
+      return HttpResponse.json(
+        {
+          data: {
+            status: 404,
+            message: 'Cart item not found',
+            success: false,
+            result: null,
+          },
+        },
+        { status: 404 }
+      );
+    }
+
+    const item = cart.items[itemIndex];
+
+    // Check stock limit
+    if (body.quantity > item.stock) {
+      return HttpResponse.json(
+        {
+          data: {
+            status: 400,
+            message: `Cannot update. Maximum stock available: ${item.stock}`,
+            success: false,
+            result: null,
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    // Update quantity
+    cart.items[itemIndex].quantity = body.quantity;
+
+    // Recalculate totals
+    const totals = calculateCartTotals(cart.items);
+    cart.totalItems = totals.totalItems;
+    cart.totalPrice = totals.totalPrice;
+    cart.updatedAt = new Date().toISOString();
+
+    // Save to localStorage
+    saveCartToStorage(cart);
+
+    return HttpResponse.json({
+      data: {
+        status: 200,
+        message: 'Cart item updated successfully',
+        success: true,
+        result: cart,
+      },
+    });
+  }),
+
+  // Remove cart item
+  http.delete(`${API_BASE_URL}/cart/items/:id`, ({ params }) => {
+    const { id } = params;
+    const cart = getCartFromStorage();
+
+    const itemIndex = cart.items.findIndex(item => item.id === id);
+
+    if (itemIndex === -1) {
+      return HttpResponse.json(
+        {
+          data: {
+            status: 404,
+            message: 'Cart item not found',
+            success: false,
+            result: null,
+          },
+        },
+        { status: 404 }
+      );
+    }
+
+    // Remove item
+    cart.items.splice(itemIndex, 1);
+
+    // Recalculate totals
+    const totals = calculateCartTotals(cart.items);
+    cart.totalItems = totals.totalItems;
+    cart.totalPrice = totals.totalPrice;
+    cart.updatedAt = new Date().toISOString();
+
+    // Save to localStorage
+    saveCartToStorage(cart);
+
+    return HttpResponse.json({
+      data: {
+        status: 200,
+        message: 'Item removed from cart successfully',
+        success: true,
+        result: cart,
+      },
+    });
+  }),
+
+  // Clear cart
+  http.delete(`${API_BASE_URL}/cart`, () => {
+    const emptyCart: Cart = {
+      items: [],
+      totalItems: 0,
+      totalPrice: 0,
+      updatedAt: new Date().toISOString(),
+    };
+
+    saveCartToStorage(emptyCart);
+
+    return HttpResponse.json({
+      data: {
+        status: 200,
+        message: 'Cart cleared successfully',
+        success: true,
+        result: emptyCart,
+      },
+    });
   }),
 ];

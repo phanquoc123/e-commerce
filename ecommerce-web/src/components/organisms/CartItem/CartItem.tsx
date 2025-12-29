@@ -115,9 +115,10 @@ export default function CartItem({
             {/* Quantity and Price */}
             <div className="mt-auto flex items-center gap-3">
               <QuantityInput value={quantity} onChange={onQuantityChange} />
-              <div className="ml-auto flex flex-col items-end">
-                <p className="text-[16px] font-extrabold text-gray-800 lg:text-[18px]">
-                  {price.toLocaleString('vi-VN')}đ
+              <div className="ml-auto flex flex-col items-end gap-0.5">
+               
+                <p className="text-[16px] font-extrabold text-red-600 lg:text-[18px]">
+                  {(price * quantity).toLocaleString('vi-VN')}đ
                 </p>
               </div>
             </div>

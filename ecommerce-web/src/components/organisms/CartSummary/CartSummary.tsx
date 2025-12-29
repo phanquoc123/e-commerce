@@ -25,30 +25,46 @@ export default function CartSummary({
     <div className="border-border-primary fixed bottom-0 left-0 z-50 h-fit w-full space-y-3 rounded-lg border bg-white p-6 lg:sticky lg:top-0 lg:z-[0] lg:w-fit lg:min-w-[436px]">
       <p className="text-theme-text text-heading-md">Chi tiết đơn hàng</p>
       
-      {/* Tổng tiền */}
+      {/* Số lượng sản phẩm */}
+      <div className="flex justify-between text-theme-text-secondary">
+        <p className="text-body-sm">Số lượng</p>
+        <p className="text-body-sm">{itemCount} sản phẩm</p>
+      </div>
+
+      {/* Tạm tính */}
       <div className="flex justify-between">
-        <p>Tổng tiền</p>
-        <p className="text-theme-text text-price-md">{subtotal.toLocaleString('vi-VN')}đ</p>
+        <p className="text-body-md">Tạm tính</p>
+        <p className="text-theme-text text-price-md font-semibold">{subtotal.toLocaleString('vi-VN')}đ</p>
+      </div>
+      
+      {/* Phí vận chuyển */}
+      <div className="flex justify-between">
+        <p className="text-body-md">Phí vận chuyển</p>
+        {shipping > 0 ? (
+          <p className="text-theme-text text-price-md font-semibold">{shipping.toLocaleString('vi-VN')}đ</p>
+        ) : (
+          <p className="text-body-md font-semibold text-green-600">Miễn phí</p>
+        )}
       </div>
       
       {/* Giảm giá */}
       {discount > 0 && (
         <div className="flex justify-between">
-          <p>Giảm giá</p>
-          <p className="text-theme-text text-price-md">{discount.toLocaleString('vi-VN')}đ</p>
+          <p className="text-body-md">Giảm giá</p>
+          <p className="text-price-md font-semibold text-green-600">-{discount.toLocaleString('vi-VN')}đ</p>
         </div>
       )}
       
       {/* Divider */}
       <div className="h-px w-full bg-gray-200" />
       
-      {/* Thành tiền */}
+      {/* Tổng cộng */}
       <div className="flex w-full justify-between">
-        <p>Thành tiền</p>
+        <p className="text-heading-sm font-bold">Tổng cộng</p>
         <div className="flex flex-col gap-1 text-end">
-          <p className="text-theme-text text-price-xl">{total.toLocaleString('vi-VN')}đ</p>
+          <p className="text-price-xl font-extrabold text-red-600">{total.toLocaleString('vi-VN')}đ</p>
           {discount > 0 && (
-            <p className="text-theme-text text-price-md">Tiết kiệm {discount.toLocaleString('vi-VN')}đ</p>
+            <p className="text-body-sm text-green-600">Đã tiết kiệm {discount.toLocaleString('vi-VN')}đ</p>
           )}
         </div>
       </div>
