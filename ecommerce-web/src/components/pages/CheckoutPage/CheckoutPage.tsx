@@ -58,8 +58,6 @@ export default function CheckoutPage() {
 
   // Watch form values
   const formValues = watch();
-  
-  console.log('🔍 Form values changed:', formValues);
 
   // Payment info from checkout data
   const paymentInfo = checkoutData
@@ -133,13 +131,11 @@ export default function CheckoutPage() {
   };
 
   const handleSaveAddress = (address: string) => {
-    console.log('📍 Saving address:', address);
     setValue('deliveryAddress', address, {
       shouldValidate: true,
       shouldTouch: true,
       shouldDirty: true,
     });
-    console.log('✅ Address saved to form');
     setIsAddressModalOpen(false);
   };
 

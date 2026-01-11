@@ -14,8 +14,6 @@ export const DeliverySection = ({
   addressError = '',
   onAddressChange,
 }: DeliverySectionProps) => {
-  console.log('🚚 DeliverySection rendered with address:', deliveryAddress);
-  
   return (
     <div className="lg:border-border-primary space-y-3 lg:space-y-4 lg:rounded-xl lg:border lg:p-6">
       <div className="flex items-center gap-1">
