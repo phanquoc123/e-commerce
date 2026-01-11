@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CheckoutLayout } from '../../templates';
 import ProductVariantDialog from '../../molecules/ProductVariantDialog/ProductVariantDialog';
 import Checkbox from '../../atoms/Checkbox/Checkbox';
@@ -6,8 +7,11 @@ import CartItem from '../../organisms/CartItem/CartItem';
 import CartSummary from '../../organisms/CartSummary/CartSummary';
 import { useCart, useUpdateCartItem, useRemoveCartItem, useAddToCart } from '../../../hooks/useCart';
 import { useProductDetail } from '../../../hooks/useProduct';
+import { toast } from 'react-toastify';
 
 export default function CartPage() {
+  const navigate = useNavigate();
+  
   // Fetch cart data from API
   const { data: cart, isLoading: isLoadingCart } = useCart();
   const updateCartItem = useUpdateCartItem();
@@ -71,7 +75,7 @@ export default function CartPage() {
 
   const handleUpdateVariant = () => {
     if (!selectedItemForVariant || !productForVariant || !newColorId) {
-      alert('Vui lòng chọn màu và size');
+      toast.warning('Vui lòng chọn màu và size');
       return;
     }
 
@@ -85,7 +89,7 @@ export default function CartPage() {
     );
 
     if (!newVariant || !newColor) {
-      alert('Không tìm thấy variant phù hợp');
+      toast.error('Không tìm thấy variant phù hợp');
       return;
     }
 
@@ -117,7 +121,7 @@ export default function CartPage() {
               setSelectedItemForVariant(null);
             },
             onError: (error: any) => {
-              alert(`❌ ${error.message}`);
+              toast.error(`❌ ${error.message}`);
             },
           }
         );
@@ -132,14 +136,41 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
-    if (!cart) return;
-    const selectedItems = cart.items.filter((item) => checkedItems.has(item.id));
-    if (selectedItems.length === 0) {
-      alert('Vui lòng chọn ít nhất một sản phẩm');
+    console.log('🛒 Checkout clicked!', { cart, checkedItems: Array.from(checkedItems) });
+    
+    if (!cart) {
+      // console.log('❌ No cart data');
+      toast.warning('Giỏ hàng trống');
       return;
     }
-    console.log('Checkout items:', selectedItems);
-    // TODO: Navigate to checkout page
+    
+    const selectedItems = cart.items.filter((item) => checkedItems.has(item.id));
+    // console.log('✅ Selected items:', selectedItems);
+    
+    if (selectedItems.length === 0) {
+      toast.warning('Vui lòng chọn ít nhất một sản phẩm');
+      return;
+    }
+
+    // Calculate totals for selected items
+    const checkoutSubtotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const checkoutShipping = checkoutSubtotal > 0 && checkoutSubtotal < 498000 ? 30000 : 0;
+    const checkoutTotal = checkoutSubtotal + checkoutShipping;
+
+    // Prepare checkout data
+    const checkoutData = {
+      items: selectedItems,
+      subtotal: checkoutSubtotal,
+      shipping: checkoutShipping,
+      discount: 0, // TODO: Add discount logic if needed
+      total: checkoutTotal,
+      isFreeShipping: checkoutShipping === 0,
+    };
+
+    // console.log('📦 Navigating to checkout with data:', checkoutData);
+    
+    // Navigate to checkout page with state
+    navigate('/checkout', { state: checkoutData });
   };
 
   // Calculate totals

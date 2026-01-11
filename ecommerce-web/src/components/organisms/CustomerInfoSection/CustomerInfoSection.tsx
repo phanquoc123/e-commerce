@@ -1,15 +1,19 @@
+import type { UseFormRegister } from 'react-hook-form';
 import { InputField } from '../../molecules/InputField/InputField';
 
 interface CustomerInfoSectionProps {
-  formData: {
+  register: UseFormRegister<any>;
+  errors?: {
     fullName: string;
     phone: string;
     email: string;
   };
-  onInputChange: (field: 'fullName' | 'phone' | 'email' | 'note') => (value: string) => void;
 }
 
-export const CustomerInfoSection = ({ formData, onInputChange }: CustomerInfoSectionProps) => {
+export const CustomerInfoSection = ({ 
+  register,
+  errors = { fullName: '', phone: '', email: '' },
+}: CustomerInfoSectionProps) => {
   return (
     <div className="lg:border-border-primary space-y-3 lg:space-y-4 lg:rounded-xl lg:border lg:p-6">
       <div className="flex items-center gap-1">
@@ -32,27 +36,62 @@ export const CustomerInfoSection = ({ formData, onInputChange }: CustomerInfoSec
         <p className="text-theme-text text-label-md lg:text-label-lg">Thông tin người nhận</p>
       </div>
 
-      <InputField
-        name="fullName"
-        placeholder="Nhập tên khách hàng"
-        value={formData.fullName}
-        onChange={onInputChange('fullName')}
-        hasError={false}
-      />
-      <InputField
-        name="phone"
-        placeholder="Nhập số điện thoại"
-        value={formData.phone}
-        onChange={onInputChange('phone')}
-        hasError={false}
-      />
-      <InputField
-        name="email"
-        placeholder="Nhập địa chỉ email (không bắt buộc)"
-        value={formData.email}
-        onChange={onInputChange('email')}
-        hasError={false}
-      />
+      <div className="relative space-y-1">
+        <InputField
+          {...register('fullName', {
+            required: 'Vui lòng nhập họ và tên',
+            minLength: {
+              value: 2,
+              message: 'Phải có ít nhất 2 ký tự',
+            },
+            validate: (value) => value.trim().length >= 2 || 'Phải có ít nhất 2 ký tự',
+          })}
+          placeholder="Nhập tên khách hàng *"
+          hasError={!!errors.fullName}
+        />
+        {errors.fullName && (
+          <span className="text-xs font-medium text-red-600">
+            {errors.fullName}
+          </span>
+        )}
+      </div>
+
+      <div className="relative space-y-1">
+        <InputField
+          {...register('phone', {
+            required: 'Vui lòng nhập SĐT',
+            pattern: {
+              value: /^(0|\+84)(3|5|7|8|9)[0-9]{8}$/,
+              message: 'SĐT không hợp lệ',
+            },
+          })}
+          placeholder="Nhập số điện thoại *"
+          hasError={!!errors.phone}
+        />
+        {errors.phone && (
+          <span className="text-xs font-medium text-red-600">
+            {errors.phone}
+          </span>
+        )}
+      </div>
+
+      <div className="relative space-y-1">
+        <InputField
+          {...register('email', {
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: 'Email không hợp lệ',
+            },
+          })}
+          placeholder="Nhập địa chỉ email (không bắt buộc)"
+          hasError={!!errors.email}
+        />
+        {errors.email && (
+          <span className="text-xs font-medium text-red-600">
+            {errors.email}
+          </span>
+        )}
+      </div>
     </div>
   );
 };

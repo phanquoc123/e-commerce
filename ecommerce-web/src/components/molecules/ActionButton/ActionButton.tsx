@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface ActionButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
   disabled?: boolean;
   children: React.ReactNode;
   icon?: React.ReactNode;
@@ -10,6 +10,7 @@ interface ActionButtonProps {
   fullWidth?: boolean;
   className?: string;
   ariaLabel?: string;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 export default function ActionButton({
@@ -22,6 +23,7 @@ export default function ActionButton({
   fullWidth = false,
   className = '',
   ariaLabel,
+  type = 'button',
 }: ActionButtonProps) {
   const baseClasses = "focus-visible:ring-ring [&_svg]:pointer-events-none [&_svg]:shrink-0 inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50";
   
@@ -61,6 +63,7 @@ export default function ActionButton({
   
   return (
     <button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       className={buttonClasses}

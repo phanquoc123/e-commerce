@@ -12,7 +12,7 @@ interface PaymentInfo {
 
 interface PaymentSectionProps {
   paymentInfo: PaymentInfo;
-  onCheckout: () => void;
+  onCheckout?: () => void;
   disabled?: boolean;
 }
 
@@ -147,8 +147,8 @@ export const PaymentSection = ({
         </div>
 
         <ActionButton
-          onClick={onCheckout}
-          disabled={false}
+          type="submit"
+          disabled={disabled}
           fullWidth
           className="rounded-full"
           ariaLabel="Đặt hàng"

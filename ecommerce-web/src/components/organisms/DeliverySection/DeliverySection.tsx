@@ -1,18 +1,21 @@
+import type { UseFormRegister } from 'react-hook-form';
 import { TextAreaField } from '../../molecules/TextAreaField/TextAreaField';
 
 interface DeliverySectionProps {
+  register: UseFormRegister<any>;
   deliveryAddress: string;
-  note: string;
+  addressError?: string;
   onAddressChange: () => void;
-  onNoteChange: (value: string) => void;
 }
 
 export const DeliverySection = ({
+  register,
   deliveryAddress,
-  note,
+  addressError = '',
   onAddressChange,
-  onNoteChange,
 }: DeliverySectionProps) => {
+  console.log('🚚 DeliverySection rendered with address:', deliveryAddress);
+  
   return (
     <div className="lg:border-border-primary space-y-3 lg:space-y-4 lg:rounded-xl lg:border lg:p-6">
       <div className="flex items-center gap-1">
@@ -37,31 +40,45 @@ export const DeliverySection = ({
         </p>
       </div>
       <div className="flex justify-center rounded-full border p-2">Giao tận nơi</div>
-      <div className="border-border-primary space-y-1 rounded-lg border px-4 py-3">
-        <div className="flex items-center justify-between">
-          <p className="text-theme-text text-label-sm">Giao tới</p>
-          <button
-            type="button"
-            onClick={onAddressChange}
-            className="text-label-md text-brandsecondary-text hover:underline"
-          >
-            Thay đổi
-          </button>
+      <div className="relative">
+        {/* Hidden input for validation */}
+        <input
+          type="hidden"
+          {...register('deliveryAddress', {
+            required: 'Vui lòng chọn địa chỉ',
+            validate: (value) => value.trim().length > 0 || 'Vui lòng chọn địa chỉ',
+          })}
+        />
+        <div className="space-y-1">
+          <div className={`border-border-primary space-y-1 rounded-lg border px-4 py-3 ${addressError ? 'border-red-500' : ''}`}>
+            <div className="flex items-center justify-between">
+              <p className="text-theme-text text-label-sm">Giao tới *</p>
+              <button
+                type="button"
+                onClick={onAddressChange}
+                className="text-label-md text-brandsecondary-text hover:underline"
+              >
+                {deliveryAddress ? 'Thay đổi' : 'Chọn địa chỉ'}
+              </button>
+            </div>
+            <p className={`text-placeholder-md line-clamp-2 ${deliveryAddress ? 'text-theme-text' : 'text-gray-400'}`}>
+              {deliveryAddress || 'Chưa chọn địa chỉ giao hàng'}
+            </p>
+          </div>
+          {addressError && (
+            <span className="text-xs font-medium text-red-600">
+              {addressError}
+            </span>
+          )}
         </div>
-        <p className="text-theme-text text-placeholder-md line-clamp-2">
-          {deliveryAddress}
-        </p>
       </div>
       <div className="h-20 space-y-1">
         <TextAreaField
-          name="note"
+          {...register('note')}
           placeholder="Nhập ghi chú (không bắt buộc)"
-          value={note}
-          onChange={onNoteChange}
           hasError={false}
           rows={4}
         />
-        <div className="flex items-start justify-between"></div>
       </div>
     </div>
   );

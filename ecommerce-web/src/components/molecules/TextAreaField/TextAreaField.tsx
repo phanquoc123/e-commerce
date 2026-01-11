@@ -1,20 +1,19 @@
-interface TextAreaFieldProps {
+import React from 'react';
+
+interface TextAreaFieldProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   name: string;
   placeholder: string;
-  value: string;
-  onChange: (value: string) => void;
   hasError?: boolean;
   rows?: number;
 }
 
-export const TextAreaField = ({
+export const TextAreaField = React.forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(({
   name,
   placeholder,
-  value,
-  onChange,
   hasError = false,
   rows = 4,
-}: TextAreaFieldProps) => {
+  ...rest
+}, ref) => {
   return (
     <div className="space-y-1">
       <div
@@ -23,16 +22,18 @@ export const TextAreaField = ({
         data-error={hasError}
       >
         <textarea
+          ref={ref}
           className="size-full resize-none border-none bg-transparent outline-none"
           data-error={hasError}
           id={name}
           placeholder={placeholder}
           name={name}
-          value={value}
-          onChange={e => onChange(e.target.value)}
           rows={rows}
+          {...rest}
         />
       </div>
     </div>
   );
-};
+});
+
+TextAreaField.displayName = 'TextAreaField';

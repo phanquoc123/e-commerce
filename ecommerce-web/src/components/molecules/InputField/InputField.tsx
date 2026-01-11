@@ -1,18 +1,17 @@
-interface InputFieldProps {
+import React from 'react';
+
+interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   name: string;
   placeholder: string;
-  value: string;
-  onChange: (value: string) => void;
   hasError?: boolean;
 }
 
-export const InputField = ({
+export const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(({
   name,
   placeholder,
-  value,
-  onChange,
   hasError = false,
-}: InputFieldProps) => {
+  ...rest
+}, ref) => {
   return (
     <div className="space-y-2">
       <div className="text-field-wrapper space-y-1">
@@ -21,16 +20,18 @@ export const InputField = ({
           data-error={hasError}
         >
           <input
+            ref={ref}
             className="size-full border-none bg-transparent outline-none"
             data-error={hasError}
             id={name}
             placeholder={placeholder}
             name={name}
-            value={value}
-            onChange={e => onChange(e.target.value)}
+            {...rest}
           />
         </div>
       </div>
     </div>
   );
-};
+});
+
+InputField.displayName = 'InputField';

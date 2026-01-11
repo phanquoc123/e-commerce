@@ -140,8 +140,10 @@ export const AddressSelectionModal = ({
   const handleSave = () => {
     if (selectedProvince && selectedDistrict && selectedWard && detailedAddress.trim()) {
       const fullAddress = `${detailedAddress.trim()}, ${selectedWard.name}, ${selectedDistrict.name}, ${selectedProvince.name}`;
+      console.log('🏠 Modal calling onSave with:', fullAddress);
       onSave(fullAddress);
-      onClose();
+      // Let parent component handle closing
+      // onClose();
       // Reset selections
       setSelectedProvince(null);
       setSelectedDistrict(null);
