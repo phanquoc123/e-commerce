@@ -46,17 +46,31 @@ export default function ProductCard({ product, className = '', onClick }: Produc
 
   // Get image based on selected color
   const getCurrentImage = () => {
-    if (selectedColor && selectedColor.images.length > 0) {
+    // Check selectedColor with safe navigation
+    if (selectedColor && selectedColor.images && selectedColor.images.length > 0) {
       // Lấy ảnh main hoặc ảnh đầu tiên
       const mainImage = selectedColor.images.find(img => img.isMain);
       return mainImage?.imageUrl || selectedColor.images[0]?.imageUrl || '/images/product/product-detail.webp';
     }
+    
+    // Try thumbnailUrl as fallback
+    if (selectedColor?.thumbnailUrl) {
+      return selectedColor.thumbnailUrl;
+    }
+    
     // Fallback: lấy ảnh đầu tiên của màu đầu tiên
     if (product.colors && product.colors.length > 0) {
       const firstColor = product.colors[0];
-      const mainImage = firstColor.images.find(img => img.isMain);
-      return mainImage?.imageUrl || firstColor.images[0]?.imageUrl || '/images/product/product-detail.webp';
+      if (firstColor.images && firstColor.images.length > 0) {
+        const mainImage = firstColor.images.find(img => img.isMain);
+        return mainImage?.imageUrl || firstColor.images[0]?.imageUrl || '/images/product/product-detail.webp';
+      }
+      // Try thumbnailUrl of first color
+      if (firstColor.thumbnailUrl) {
+        return firstColor.thumbnailUrl;
+      }
     }
+    
     // Return placeholder image instead of empty string
     return '/images/product/product-detail.webp';
   };
@@ -79,7 +93,7 @@ export default function ProductCard({ product, className = '', onClick }: Produc
         src={getCurrentImage()}
         alt={product.name}
         colorId={selectedColor?.id}
-        sizeId={selectedColor?.sizes[0]?.id}
+        sizeId={selectedColor?.sizes?.[0]?.id}
       />
 
       <ProductInfo name={product.name} price={product.price} salePrice={product.salePrice} />

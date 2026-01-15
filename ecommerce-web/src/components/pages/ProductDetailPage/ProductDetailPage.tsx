@@ -187,10 +187,22 @@ export default function ProductDetailPage() {
     [selectedColorId, setSearchParams]
   );
 
+  // Get selected color and size names
+  const selectedColorName = useMemo(() => {
+    const selectedColor = product?.colors?.find((c: any) => Number(c.id) === selectedColorId);
+    return selectedColor?.name || '';
+  }, [product?.colors, selectedColorId]);
+
+  const selectedSizeName = useMemo(() => {
+    const selectedColor = product?.colors?.find((c: any) => Number(c.id) === selectedColorId);
+    const selectedSize = selectedColor?.sizes?.find((s: any) => Number(s.id) === selectedSizeId);
+    return selectedSize?.name || '';
+  }, [product?.colors, selectedColorId, selectedSizeId]);
+
   return (
     <MainLayout>
       <main className="mx-auto max-w-screen-sm lg:max-w-full">
-        <Breadcrums />
+        <Breadcrums productName={product?.name} productColorName={selectedColorName} productSize={selectedSizeName} />
         <div className="mx-auto flex w-full flex-col lg:max-w-screen-2xl lg:flex-row lg:gap-12 lg:px-24 lg:py-8">
           {/* Product Images */}
           <div className="flex w-[648px] flex-col gap-8">

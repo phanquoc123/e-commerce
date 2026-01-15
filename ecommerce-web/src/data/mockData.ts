@@ -355,7 +355,7 @@ export const mockBlogPosts: BlogPost[] = [
     id: 'blog-2',
     title: 'MUA 2 ÁO GIÓ NHẬN NGAY QUÀ TẶNG ÁO THUN HOẶC POLO - ƯU ĐÃI MỪNG RA MẮT BST THU ĐÔNG',
     slug: '/post/mua-2-ao-gio-tang-qua',
-    image: 'https://images.unsplash.com/photo-1544966503-7cc4ac81b9a1?w=500&h=300&fit=crop',
+    image: 'https://buggy.yodycdn.com/images/raw/3b0111124eec0e7cf4bc21fe1fc09967.jpeg',
     publishDate: '9/10/2025',
     excerpt: 'Ưu đãi đặc biệt cho bộ sưu tập Thu Đông mới nhất'
   },
@@ -385,9 +385,9 @@ export const mockBlogPosts: BlogPost[] = [
   },
   {
     id: 'blog-6',
-    title: 'BST THU ĐÔNG AW25 - DÒNG CHẢY KẾT NỐI',
+    title: 'TOP 20+ shop quần áo nữ Hải Phòng đẹp & chất lượng nhất không thể bỏ lỡ 2026',
     slug: '/post/bst-thu-dong-aw25-dong-chay-ket-noi',
-    image: 'https://images.unsplash.com/photo-1558769132-cb1aea1f1f88?w=500&h=300&fit=crop',
+    image: 'https://buggy.yodycdn.com/images/raw/d677edf4170b4d294ad4aa7354520565.png',
     publishDate: '1/10/2025',
     excerpt: 'Khám phá ngay bộ sưu tập Thu Đông với thiết kế độc đáo'
   }

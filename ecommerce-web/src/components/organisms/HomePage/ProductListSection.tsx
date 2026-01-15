@@ -37,9 +37,9 @@ export default function ProductListSection() {
                   </SwiperSlide>
                 ))}
               </Swiper>
-              <div className="mb-3 flex justify-center">
+              {/* <div className="mb-3 flex justify-center">
                 <SeeMoreButton />
-              </div>
+              </div> */}
             </div>
 
             {/* Desktop: Grid */}

@@ -125,3 +125,61 @@ export const useProductDetail = (slug: string, colorId: number | null, sizeId: n
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };
+
+// Search product type (same as ProductCard expects)
+export interface SearchProductItem {
+  id: number;
+  name: string;
+  slug: string;
+  price: number;
+  salePrice?: number | null;
+  colors?: Array<{
+    id: number;
+    name: string;
+    code: string;
+    hexCode: string | null;
+    thumbnailUrl: string | null;
+    productColorId: number;
+    images: Array<{
+      id: number;
+      imageUrl: string;
+      isMain: boolean;
+      sortOrder: number;
+    }>;
+    sizes: Array<{
+      id: number;
+      name: string;
+      code: string;
+      stock: number;
+    }>;
+  }>;
+}
+
+export interface SearchProductResult {
+  items: SearchProductItem[];
+  total: number;
+  query: string;
+}
+
+// Search products hook
+export const useSearchProducts = (query: string, limit: number = 10) => {
+  return useQuery({
+    queryKey: ['searchProducts', query, limit],
+    queryFn: async () => {
+      try {
+        if (!query || query.trim().length === 0) {
+          return { items: [], total: 0, query: '' } as SearchProductResult;
+        }
+        const response = await productService.searchProducts(query, limit);
+        const data = response.data?.data?.result as SearchProductResult;
+        return data;
+      } catch (error) {
+        console.error('❌ Error in searchProducts:', error);
+        return { items: [], total: 0, query } as SearchProductResult;
+      }
+    },
+    enabled: !!query && query.trim().length > 0,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+  });
+};

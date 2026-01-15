@@ -1,7 +1,12 @@
 import { memo } from 'react';
 
-function Breadcrums() {
-  console.log('Breadcrums render');
+type BreadcrumsProps = {
+  productName?: string;
+  productColorName?: string;
+  productSize?: string;
+};
+
+function Breadcrums({ productName, productColorName, productSize }: BreadcrumsProps) {
   return (
     <>
       <nav className="border-border-primary hidden border-b border-t px-12 py-4 lg:block">
@@ -18,8 +23,8 @@ function Breadcrums() {
               aria-disabled="true"
               className="text-theme-text line-clamp-1 max-w-[260px] lg:max-w-full"
             >
-              {/* {productName} - {productColorName} - {productSize} */}
-              Áo Polo Nam Mắt Chim Cơ Bản Dáng Suông - Tím Than 006 - S
+              {productName} - {productColorName} - {productSize}
+             
             </a>
           </li>
         </ol>

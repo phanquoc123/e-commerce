@@ -425,7 +425,7 @@ const mockCollectionsWithProducts = {
         name: 'SMART COOL',
         slug: 'smart-cool',
         description: 'Công nghệ làm mát thông minh',
-        thumbnailUrl: 'https://buggy.yodycdn.com/images/home-collection-product-dt/f1f7457593a39f0712c619e68a6260b6.webp?width=2688&height=360',
+        thumbnailUrl: 'https://buggy.yodycdn.com/images/home-collection-product-dt/e7fc7e3e6316ba92dacec7ec6dcf25c1.webp?width=2688&height=360',
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -452,6 +452,148 @@ const mockCollectionsWithProducts = {
     ],
   },
 };
+
+// ============================================
+// MOCK PRODUCTS LIST for Search (with colors)
+// ============================================
+const mockColors = [
+  {
+    id: 1,
+    name: 'Trắng',
+    code: 'white',
+    hexCode: '#FFFFFF',
+    thumbnailUrl: '/images/product/product-detail.webp',
+    productColorId: 101,
+    images: [
+      {
+        id: 1,
+        imageUrl: '/images/product/product-detail.webp',
+        isMain: true,
+        sortOrder: 1,
+      },
+    ],
+    sizes: [
+      { id: 1, name: 'S', code: 'S', stock: 10 },
+      { id: 2, name: 'M', code: 'M', stock: 15 },
+      { id: 3, name: 'L', code: 'L', stock: 20 },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Đen',
+    code: 'black',
+    hexCode: '#000000',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop',
+    productColorId: 102,
+    images: [
+      {
+        id: 2,
+        imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop',
+        isMain: true,
+        sortOrder: 1,
+      },
+    ],
+    sizes: [
+      { id: 1, name: 'S', code: 'S', stock: 10 },
+      { id: 2, name: 'M', code: 'M', stock: 15 },
+      { id: 3, name: 'L', code: 'L', stock: 20 },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Xanh Navy',
+    code: 'navy',
+    hexCode: '#001f3f',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=200&h=200&fit=crop',
+    productColorId: 103,
+    images: [
+      {
+        id: 3,
+        imageUrl: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&h=400&fit=crop',
+        isMain: true,
+        sortOrder: 1,
+      },
+    ],
+    sizes: [
+      { id: 1, name: 'S', code: 'S', stock: 10 },
+      { id: 2, name: 'M', code: 'M', stock: 15 },
+      { id: 3, name: 'L', code: 'L', stock: 20 },
+    ],
+  },
+];
+
+// Flatten all products from collections and add colors
+const mockProductsList = mockCollectionsWithProducts.data.result.flatMap((collection: any) =>
+  collection.products.map((product: any, index: number) => ({
+    ...product,
+    colors: [
+      mockColors[0],
+      mockColors[1],
+      ...(index % 3 === 0 ? [mockColors[2]] : []),
+    ],
+    salePrice: index % 2 === 0 ? Math.floor(product.price * 0.8) : null,
+  }))
+);
+
+// Additional mock products for variety
+const additionalMockProducts = [
+  {
+    id: 401,
+    name: 'Quần jean nam slim fit',
+    slug: 'quan-jean-nam-slim-fit',
+    description: 'Quần jean nam co giãn thoải mái',
+    price: 399000,
+    salePrice: 349000,
+    isActive: true,
+    category: { id: 14, name: 'Quần jean nam', slug: 'quan-jean-nam' },
+    colors: [mockColors[1], mockColors[2]],
+  },
+  {
+    id: 402,
+    name: 'Áo khoác bomber nam',
+    slug: 'ao-khoac-bomber-nam',
+    description: 'Áo khoác bomber phong cách Hàn Quốc',
+    price: 599000,
+    isActive: true,
+    category: { id: 2, name: 'Áo khoác nam', slug: 'ao-khoac-nam' },
+    colors: [mockColors[0], mockColors[1]],
+  },
+  {
+    id: 403,
+    name: 'Giày sneaker trắng',
+    slug: 'giay-sneaker-trang',
+    description: 'Giày sneaker basic phối đồ dễ dàng',
+    price: 799000,
+    salePrice: 699000,
+    isActive: true,
+    category: { id: 20, name: 'Giày dép', slug: 'giay-dep' },
+    colors: [mockColors[0]],
+  },
+  {
+    id: 404,
+    name: 'Quần kaki nam',
+    slug: 'quan-kaki-nam',
+    description: 'Quần kaki form regular thoải mái',
+    price: 349000,
+    isActive: true,
+    category: { id: 12, name: 'Quần kaki nam', slug: 'quan-kaki-nam' },
+    colors: [mockColors[1], mockColors[2], mockColors[0]],
+  },
+  {
+    id: 405,
+    name: 'Áo sơ mi nam dài tay',
+    slug: 'ao-so-mi-nam-dai-tay',
+    description: 'Áo sơ mi nam công sở',
+    price: 299000,
+    salePrice: 249000,
+    isActive: true,
+    category: { id: 9, name: 'Áo sơ mi nam', slug: 'ao-so-mi-nam' },
+    colors: [mockColors[0], mockColors[1]],
+  },
+];
+
+// Combine all products
+const allMockProducts = [...mockProductsList, ...additionalMockProducts];
 
 // ============================================
 // MOCK DATA - Product Detail with Variants
@@ -931,6 +1073,31 @@ export const handlers = [
     const productDetail = createMockProductDetail(parsedColorId, parsedSizeId);
 
     return HttpResponse.json(productDetail);
+  }),
+
+  // Search products
+  http.get(`${API_BASE_URL}/products/search`, ({ request }) => {
+    const url = new URL(request.url);
+    const query = url.searchParams.get('q') || '';
+    const limit = parseInt(url.searchParams.get('limit') || '10');
+
+    // Search from allMockProducts by name
+    const searchResults = allMockProducts.filter((product) =>
+      product.name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    return HttpResponse.json({
+      data: {
+        status: 200,
+        message: 'Success',
+        success: true,
+        result: {
+          items: searchResults.slice(0, limit),
+          total: searchResults.length,
+          query,
+        },
+      },
+    });
   }),
 
   // Create category (POST)

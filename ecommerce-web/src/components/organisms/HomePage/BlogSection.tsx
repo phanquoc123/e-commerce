@@ -35,7 +35,7 @@ export default function BlogSection() {
           </Swiper>
         </div>
 
-        <SeeMoreButton />
+        {/* <SeeMoreButton /> */}
       </div>
     </>
   );
